@@ -1,5 +1,4 @@
 import StatementLayout from '../layouts/StatementLayout.jsx'
-import BoxGrid from '../components/BoxGrid.jsx'
 
 export default function S20Lifecycle() {
   return (
@@ -16,8 +15,8 @@ export default function S20Lifecycle() {
           body: 'Automatic memories and continuous improvement.',
         },
       ]}
-    >
-      <BoxGrid items={['Evaluations', 'Observability', 'Self-Learning']} />
-    </StatementLayout>
+    />
   )
 }
+
+S20Lifecycle.schema = 'lifecycle'

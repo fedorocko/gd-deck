@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import Schema from './components/Schema.jsx'
 import slides from './slides/index.js'
 import useStageScale, { STAGE_H, STAGE_W } from './useStageScale.js'
 
@@ -67,6 +68,11 @@ export default function App() {
       >
         {/* key remounts the slide so the entrance animation replays */}
         <Slide key={index} />
+
+        {/* Slides that carry a schema state share one diagram. It lives out
+            here, unkeyed, so it survives the slide change and animates from
+            the previous state instead of being redrawn. */}
+        {Slide.schema && <Schema state={Slide.schema} />}
       </div>
 
       <button

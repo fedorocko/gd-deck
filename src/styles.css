@@ -8,6 +8,11 @@
   --faint: rgba(244, 243, 239, 0.3);
   --accent: #c6f24e;
   --accent-2: #7cc7ff;
+  /* the accent thinned out, for the schema's highlighted fills and strokes */
+  --accent-wash: rgba(198, 242, 78, 0.12);
+  --accent-line: rgba(198, 242, 78, 0.5);
+
+  --ease-move: cubic-bezier(0.22, 0.8, 0.3, 1);
 
   --pad: 120px;
   --font: 'Inter Tight', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica,
@@ -737,20 +742,145 @@ li {
   align-self: stretch;
 }
 
-.boxgrid {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+/* ------------------------------------------------------ the schema diagram */
+/* Slides 15-26 share one diagram that unfolds itself. It is mounted once, in
+   the stage rather than in the slide, so it animates across slide changes.
+   Geometry comes from src/schema/ in a 600-wide space; everything here is the
+   look and the timing. `--d` is the per-element fade delay: new boxes wait for
+   the old ones to have finished moving before they appear. */
+
+.schema {
+  position: absolute;
+  overflow: hidden;
+  /* the column runs past the slot in both directions: fade it out rather than
+     letting boxes end on a hard cut */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 24px,
+    #000 calc(100% - 24px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 24px,
+    #000 calc(100% - 24px),
+    transparent 100%
+  );
+  animation: rise 420ms var(--ease-move) both;
 }
 
-.boxgrid__cell {
+.schema__world {
+  position: absolute;
+  top: 0;
+  /* trails the boxes: they make room first, then the view re-centres */
+  transition: transform 680ms var(--ease-move) 140ms;
+}
+
+/* ------------------------------------------------------------------- boxes */
+.sx {
+  position: absolute;
+  top: 0;
+  left: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 148px;
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  background: var(--surface);
-  font-size: 30px;
+  text-align: center;
+  padding: 0 14px;
+  line-height: 1.15;
   letter-spacing: -0.015em;
+  color: var(--muted);
+  background: rgba(244, 243, 239, 0.035);
+  border: 1px solid var(--line);
+  transition: transform 520ms var(--ease-move),
+    width 520ms var(--ease-move), height 520ms var(--ease-move),
+    font-size 520ms var(--ease-move), border-radius 520ms var(--ease-move),
+    background-color 420ms ease, border-color 420ms ease, color 420ms ease,
+    box-shadow 420ms ease, opacity 320ms ease var(--d, 0ms);
+}
+
+/* What this slide is about. */
+.sx--hl {
+  color: var(--paper);
+  background: var(--accent-wash);
+  border-color: var(--accent-line);
+  box-shadow: 0 14px 36px -28px rgba(198, 242, 78, 0.5);
+}
+
+/* ------------------------------------------------- column and arrow labels */
+.sx-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 22px;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  color: var(--faint);
+  white-space: nowrap;
+  transition: transform 520ms var(--ease-move), width 520ms var(--ease-move),
+    color 420ms ease, opacity 320ms ease var(--d, 0ms);
+}
+
+.sx-label--hl {
+  color: var(--accent);
+}
+
+/* Set beside an arrow, so it reads from the box it points away from. */
+.sx-label--arrow {
+  height: 26px;
+  justify-content: flex-start;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  color: var(--paper);
+}
+
+/* --------------------------------------------- grouping frames and arrows  */
+.sx-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 1px solid var(--accent-line);
+  border-radius: 18px;
+  background: rgba(198, 242, 78, 0.045);
+  transition: transform 520ms var(--ease-move), width 520ms var(--ease-move),
+    height 520ms var(--ease-move), opacity 320ms ease var(--d, 0ms);
+}
+
+.sx-arrows {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.sx-arrows path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-opacity: 0.8;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: opacity 320ms ease var(--d, 0ms);
+}
+
+.sx-arrows path.sx-arrows__head {
+  fill: var(--accent);
+  stroke: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .schema,
+  .schema__world,
+  .sx,
+  .sx-label,
+  .sx-frame,
+  .sx-arrows path {
+    animation: none;
+    transition: none;
+  }
 }

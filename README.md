@@ -20,10 +20,42 @@ nothing needs responsive rules and font sizes can be literal.
 | Path | What it holds |
 | --- | --- |
 | `src/slides/index.js` | the running order — **reorder the deck here** |
-| `src/slides/S01…S19.jsx` | one file per slide, content only |
+| `src/slides/S01…S31.jsx` | one file per slide, content only |
 | `src/layouts/` | the five layouts every slide is built from |
+| `src/schema/` | the animated diagram behind slides 15–26 |
 | `src/styles.css` | design tokens and every shared style |
 | `src/media.js` | slide images and video |
+
+## The schema on slides 15–26
+
+Those twelve slides share **one diagram** that unfolds as you go, rather than twelve
+separate pictures. A slide opts in by naming a state:
+
+```js
+S30Management.schema = 'management'
+```
+
+`App.jsx` renders the diagram outside the keyed slide, so it survives the slide change and
+animates from the previous state instead of being redrawn.
+
+| Path | What it holds |
+| --- | --- |
+| `src/schema/model.js` | the tree of every box, and the twelve states over it |
+| `src/schema/layout.js` | turns a state into geometry: rectangles, frames, arrows |
+| `src/components/Schema.jsx` | renders it and stages the timing |
+
+To change what a slide shows, edit its state in `model.js` — `expand` unfolds a branch, `hl`
+highlights, `focus` says what the view centres on. To add a box, put it in the tree; it will
+be laid out in every state, hidden until some state expands its parent.
+
+Two things are deliberate. **Tier decides size**: a tier-1 box is taller and set larger than
+tier 2, which outranks tier 3, and each tier keeps a fixed inset so same-rank borders line up
+whatever branch they hang off. **The scale never changes** — only the vertical offset does —
+so a box reads the same size on every slide and size stays legible as rank.
+
+Transitions are plain CSS, staged by delay so a viewer can follow them: boxes shift to make
+room, the view slides to re-centre, and only then do the newly uncovered boxes fade up. No
+animation library is involved; the timings live in the `.schema` block of `styles.css`.
 
 ## Swapping in real media
 

@@ -1,5 +1,4 @@
 import StatementLayout from '../layouts/StatementLayout.jsx'
-import BoxGrid from '../components/BoxGrid.jsx'
 
 export default function S30Management() {
   return (
@@ -10,10 +9,8 @@ export default function S30Management() {
         'Governance & Control',
         'Lifecycle Management',
       ]}
-    >
-      <BoxGrid
-        items={['Lifecycle', 'Governance & Control', 'Context & Definitions']}
-      />
-    </StatementLayout>
+    />
   )
 }
+
+S30Management.schema = 'management'

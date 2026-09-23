@@ -1,5 +1,4 @@
 import StatementLayout from '../layouts/StatementLayout.jsx'
-import BoxGrid from '../components/BoxGrid.jsx'
 
 export default function S31GovernanceTools() {
   return (
@@ -10,10 +9,8 @@ export default function S31GovernanceTools() {
         'Context Governance (AI Hub)',
         'Agent Governance (Agent Builder)',
       ]}
-    >
-      <BoxGrid
-        items={['Data Governance', 'Context Governance', 'Agent Governance']}
-      />
-    </StatementLayout>
+    />
   )
 }
+
+S31GovernanceTools.schema = 'governance'

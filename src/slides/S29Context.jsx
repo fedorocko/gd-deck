@@ -1,5 +1,4 @@
 import StatementLayout from '../layouts/StatementLayout.jsx'
-import BoxGrid from '../components/BoxGrid.jsx'
 
 export default function S29Context() {
   return (
@@ -19,8 +18,8 @@ export default function S29Context() {
           body: 'Tailored for each individual agent.',
         },
       ]}
-    >
-      <BoxGrid items={['Personalities', 'Knowledge & Memories', 'Data Semantics']} />
-    </StatementLayout>
+    />
   )
 }
+
+S29Context.schema = 'context'

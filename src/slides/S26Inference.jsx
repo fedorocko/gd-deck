@@ -12,3 +12,5 @@ export default function S26Inference() {
     />
   )
 }
+
+S26Inference.schema = 'inference'

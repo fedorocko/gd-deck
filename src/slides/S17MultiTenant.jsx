@@ -12,3 +12,6 @@ export default function S17MultiTenant() {
     />
   )
 }
+
+// The one authored stack, fanned out to many tenants over shared infrastructure.
+S17MultiTenant.schema = 'tenants'
