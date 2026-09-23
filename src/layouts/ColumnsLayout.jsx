@@ -1,3 +1,5 @@
+import asset from '../asset.js'
+
 /**
  * columns: [{ icon, head, body, items }]
  * Renders 3 or 4 evenly weighted columns under a slide heading.
@@ -30,7 +32,7 @@ export default function ColumnsLayout({
         {columns.map((col) => (
           <div className="col" key={col.head}>
             {col.icon && !iconBelow && (
-              <img className="col__icon" src={col.icon} alt="" />
+              <img className="col__icon" src={asset(col.icon)} alt="" />
             )}
             <h3 className="colhead">
               {display ? (
@@ -53,7 +55,7 @@ export default function ColumnsLayout({
             {col.icon && iconBelow && (
               <img
                 className="col__icon col__icon--below"
-                src={col.icon}
+                src={asset(col.icon)}
                 alt=""
               />
             )}

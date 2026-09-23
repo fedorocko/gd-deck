@@ -4,12 +4,36 @@
 
 ```bash
 npm install
-npm run dev      # http://localhost:5173
+npm run dev      # http://localhost:5173/gd-deck/
 npm run build    # static output in dist/
 ```
 
+Dev and build both run under the `/gd-deck/` base that GitHub Pages serves from, so
+what you see locally is what ships.
+
 **Navigating:** the two floating buttons, or `←`/`→` (also `space`, `PageUp`/`PageDown`,
 `Home`/`End`). Present with the browser in fullscreen (`⌃⌘F` / `F11`).
+
+## Publishing
+
+Pushing to `main` builds the deck and publishes it to
+**https://fedorocko.github.io/gd-deck/** via `.github/workflows/deploy.yml`.
+
+One-time setup, in the repo on GitHub: **Settings → Pages → Build and deployment →
+Source: GitHub Actions**. Nothing else to configure; there is no `gh-pages` branch.
+
+Pages serves the site from `/gd-deck/`, not the domain root, so `vite.config.js` sets
+`base` to match. Vite rewrites asset URLs in `index.html`, but not paths written as
+strings in JavaScript — those go through `src/asset.js`, so keep writing them the
+documented way (`/media/hero.mp4`) and let the helper prefix the base.
+
+Moving the deck elsewhere means changing the base:
+
+```bash
+BASE_PATH=/ npm run build        # custom domain, or a <user>.github.io repo
+```
+
+For a custom domain, also put the domain in `public/CNAME` and set it under Settings → Pages.
 
 ## How it is put together
 

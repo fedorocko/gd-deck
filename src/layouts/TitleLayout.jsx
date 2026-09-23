@@ -1,3 +1,5 @@
+import asset from '../asset.js'
+
 /**
  * Full-bleed title statement.
  * art: image dropped beside the copy so a text-only slide has something to hold.
@@ -24,7 +26,7 @@ export default function TitleLayout({
           </p>
         )}
       </div>
-      {art && <img className="titleart" src={art} alt="" />}
+      {art && <img className="titleart" src={asset(art)} alt="" />}
     </section>
   )
 }

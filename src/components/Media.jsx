@@ -1,3 +1,4 @@
+import assetUrl from '../asset.js'
 import media from '../media.js'
 
 /** Renders the asset for `name`, or a labelled placeholder until it exists. */
@@ -16,9 +17,9 @@ export default function Media({ name, className = '', style }) {
   return (
     <div className={cls} style={style}>
       {asset.kind === 'video' ? (
-        <video src={asset.src} autoPlay muted loop playsInline />
+        <video src={assetUrl(asset.src)} autoPlay muted loop playsInline />
       ) : (
-        <img src={asset.src} alt="" />
+        <img src={assetUrl(asset.src)} alt="" />
       )}
     </div>
   )
