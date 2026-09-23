@@ -1,0 +1,756 @@
+/* ---------------------------------------------------------------- tokens */
+:root {
+  --ink: #0b0d0c;
+  --surface: #141817;
+  --line: rgba(244, 243, 239, 0.12);
+  --paper: #f4f3ef;
+  --muted: rgba(244, 243, 239, 0.56);
+  --faint: rgba(244, 243, 239, 0.3);
+  --accent: #c6f24e;
+  --accent-2: #7cc7ff;
+
+  --pad: 120px;
+  --font: 'Inter Tight', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica,
+    Arial, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #000;
+  color: var(--paper);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+h1,
+h2,
+h3,
+p,
+ul,
+li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-weight: 400;
+}
+
+/* ------------------------------------------------------------ stage/deck */
+.deck {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #000;
+}
+
+/* Every slide is authored against a fixed 1600x900 space and scaled. */
+.stage {
+  width: 1600px;
+  height: 900px;
+  flex: none;
+  position: relative;
+  overflow: hidden;
+  background: var(--ink);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: center center;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  padding: var(--pad);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  animation: rise 420ms cubic-bezier(0.22, 0.8, 0.3, 1) both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide {
+    animation: none;
+  }
+}
+
+/* --------------------------------------------------------------- nav ui  */
+.nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: rgba(20, 24, 23, 0.55);
+  color: var(--paper);
+  backdrop-filter: blur(8px);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity 160ms ease, transform 160ms ease, border-color 160ms ease;
+  z-index: 10;
+}
+
+.nav:hover:not(:disabled) {
+  opacity: 1;
+  border-color: rgba(244, 243, 239, 0.35);
+  transform: translateY(-50%) scale(1.06);
+}
+
+.nav:focus-visible {
+  opacity: 1;
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.nav:disabled {
+  opacity: 0.1;
+  cursor: default;
+}
+
+.nav--prev {
+  left: 28px;
+}
+.nav--next {
+  right: 28px;
+}
+
+.nav svg {
+  width: 20px;
+  height: 20px;
+}
+
+.progress {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--accent);
+  transition: width 260ms cubic-bezier(0.22, 0.8, 0.3, 1);
+  z-index: 10;
+}
+
+/* ------------------------------------------------------------ type scale */
+.display {
+  text-wrap: balance;
+  font-size: 112px;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  font-weight: 500;
+}
+
+.h1 {
+  text-wrap: balance;
+  font-size: 84px;
+  line-height: 1.02;
+  letter-spacing: -0.032em;
+  font-weight: 500;
+}
+
+.h2 {
+  text-wrap: balance;
+  font-size: 64px;
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  font-weight: 500;
+}
+
+/* A heading that must read as one line: no wrap, set down to clear the pad. */
+.h2--fit {
+  white-space: nowrap;
+  font-size: 52px;
+  letter-spacing: -0.032em;
+}
+
+.h3 {
+  text-wrap: balance;
+  font-size: 56px;
+  line-height: 1.08;
+  letter-spacing: -0.028em;
+  font-weight: 500;
+}
+
+.colhead {
+  font-size: 40px;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  font-weight: 500;
+}
+
+.body {
+  font-size: 26px;
+  line-height: 1.45;
+  color: var(--muted);
+  max-width: 30ch;
+}
+
+.eyebrow {
+  font-size: 18px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--faint);
+  font-weight: 500;
+}
+
+.kicker {
+  font-size: 22px;
+  line-height: 1.4;
+  color: var(--faint);
+  max-width: 34ch;
+}
+
+.accent {
+  color: var(--accent);
+}
+
+/* --------------------------------------------------------------- badges  */
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+/* Solid lime: the badges name what each pillar ships, so they read as the
+   slide's second voice rather than fine print. */
+.badge {
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.015em;
+  padding: 16px 26px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- media  */
+.media {
+  border-radius: 28px;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  position: relative;
+}
+
+.media img,
+.media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.media--empty {
+  display: grid;
+  place-items: center;
+  background: repeating-linear-gradient(
+    -45deg,
+    #141817,
+    #141817 14px,
+    #171b1a 14px,
+    #171b1a 28px
+  );
+}
+
+.media__label {
+  text-align: center;
+  padding: 0 32px;
+  color: var(--faint);
+  font-size: 17px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.7;
+}
+
+/* --------------------------------------------------------------- layouts */
+.split {
+  display: grid;
+  grid-template-columns: 1fr 460px;
+  gap: 96px;
+  height: 100%;
+  align-items: center;
+}
+
+.split__text--case .body {
+  max-width: 42ch;
+  font-size: 24px;
+}
+
+.split__text {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.split__media {
+  height: 660px;
+  align-self: center;
+}
+
+/* Case studies use landscape press photos, so the frame matches their 3:2
+   instead of cropping the client's logo out of a portrait slot. */
+.split--case {
+  grid-template-columns: 1fr 680px;
+  gap: 80px;
+}
+
+.split__media--case {
+  height: auto;
+  aspect-ratio: 3 / 2;
+}
+
+.cols {
+  display: grid;
+  gap: 56px;
+}
+
+.cols--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.cols--4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.col__icon {
+  width: 150px;
+  height: 150px;
+  display: block;
+  margin: -9px 0 6px -9px;
+}
+
+.col__icon--below {
+  /* inset from the column edge so the art sits in the copy's measure rather
+     than running the full width */
+  width: calc(100% - 40px);
+  height: auto;
+  aspect-ratio: 1;
+  /* auto top margin bottom-aligns the art across columns of uneven copy */
+  margin: auto auto 0;
+}
+
+/* Reserved room for art not yet placed: same box col__icon--below would fill. */
+.col__slot {
+  display: block;
+  width: calc(100% - 40px);
+  aspect-ratio: 1;
+  margin: auto auto 0;
+}
+
+/* Display columns: the head does the work — set large, with the shared
+   initial pushed further still. */
+.cols--display .colhead {
+  font-size: 68px;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  display: flex;
+  align-items: baseline;
+}
+
+.cols--display .colhead__lead {
+  font-size: 1.32em;
+  color: var(--accent);
+  letter-spacing: -0.05em;
+  /* optically nudge the oversized cap back into the column's left edge */
+  margin-left: -0.045em;
+}
+
+.col__body {
+  font-size: 23px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.col__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 23px;
+  color: var(--muted);
+}
+
+.col__list li {
+  padding-left: 22px;
+  position: relative;
+}
+
+.col__list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 13px;
+  width: 8px;
+  height: 1px;
+  background: var(--accent);
+}
+
+.slidehead {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 76px;
+}
+
+.slidehead .kicker {
+  max-width: 62ch;
+}
+
+/* When the line under the title is the claim itself, not a caption. */
+.slidehead__lede {
+  font-size: 36px;
+  line-height: 1.3;
+  letter-spacing: -0.018em;
+  color: var(--paper);
+  max-width: 34ch;
+}
+
+/* ---------------------------------------------------------- title slide  */
+.slide--title {
+  justify-content: center;
+}
+
+.titleblock {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  max-width: 1180px;
+}
+
+.titleblock__sub {
+  font-size: 34px;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+  color: var(--muted);
+  max-width: 880px;
+}
+
+/* When the subtitle is the claim rather than a gloss on the title. */
+.titleblock__sub--lead {
+  font-size: 40px;
+  line-height: 1.28;
+  letter-spacing: -0.02em;
+  color: var(--paper);
+}
+
+/* First line of a two-line subtitle: it names the thing, so it leads. */
+.sub-lede {
+  display: inline-block;
+  font-size: 52px;
+  letter-spacing: -0.025em;
+}
+
+/* Art beside the copy: the block stops being full-bleed and shares the row. */
+.slide--title--art {
+  flex-direction: row;
+  align-items: center;
+  gap: 96px;
+}
+
+.slide--title--art .titleblock {
+  flex: 1;
+  max-width: none;
+}
+
+.titleart {
+  width: 440px;
+  height: 440px;
+  flex: none;
+}
+
+/* -------------------------------------------------------- section slide  */
+.slide--section {
+  justify-content: center;
+}
+
+.sectionblock {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  max-width: 1340px;
+  border-left: 3px solid var(--accent);
+  padding-left: 48px;
+}
+
+/* On a section slide the kicker is a subheading under the statement, not a
+   marginal note, so it is set larger and allowed a wider measure. */
+.sectionblock .kicker {
+  font-size: 30px;
+  color: var(--muted);
+  max-width: 48ch;
+}
+
+.flag {
+  position: absolute;
+  top: 56px;
+  left: var(--pad);
+  font-size: 15px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--accent);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.arc {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  font-size: 26px;
+  color: var(--muted);
+  counter-reset: arc;
+}
+
+.arc li {
+  display: flex;
+  gap: 16px;
+  align-items: baseline;
+}
+
+.arc__ref {
+  color: var(--accent);
+  font-size: 20px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.arc__note {
+  color: var(--faint);
+  font-size: 20px;
+  white-space: nowrap;
+}
+
+.arc li::before {
+  counter-increment: arc;
+  content: counter(arc);
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+  font-size: 20px;
+  min-width: 22px;
+}
+
+.arc strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------ hero slide */
+.slide--hero {
+  padding: 0;
+  display: grid;
+}
+
+.hero__media {
+  position: absolute;
+  inset: 0;
+  border-radius: 0;
+  border: 0;
+}
+
+.hero__scrim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(11, 13, 12, 0.5) 0%,
+    rgba(11, 13, 12, 0.82) 72%
+  );
+}
+
+.hero__media .media__label {
+  position: absolute;
+  bottom: 40px;
+  left: 0;
+  right: 0;
+  opacity: 0.55;
+}
+
+.hero__text {
+  position: relative;
+  place-self: center;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  text-align: center;
+  padding: 0 80px;
+}
+
+.hero__headline {
+  font-size: 96px;
+  line-height: 1.04;
+  letter-spacing: -0.034em;
+  font-weight: 500;
+}
+
+.hero__sub {
+  font-size: 38px;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  color: var(--muted);
+}
+
+/* ----------------------------------------------------- multi-tenant grid */
+/* Title on the left, the two tenancy panes stacked on the right. */
+.duo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 96px;
+  height: 100%;
+  align-items: center;
+}
+
+.duo__intro {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.duo__stack {
+  display: flex;
+  flex-direction: column;
+  gap: 64px;
+}
+
+/* Art in the gutter so the two panes read as one column of copy. */
+.duo__col {
+  display: grid;
+  grid-template-columns: 132px 1fr;
+  gap: 28px;
+  align-items: center;
+}
+
+.duo__head {
+  font-size: 34px;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.duo__lede {
+  font-size: 22px;
+  line-height: 1.45;
+  letter-spacing: -0.005em;
+  color: var(--muted);
+}
+
+.duo__art {
+  width: 132px;
+  height: 132px;
+  display: block;
+}
+
+
+/* ------------------------------------------------------ statement slides */
+/* A single claim carried at half-stage width, art or a diagram beside it. */
+.statement {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 96px;
+  height: 100%;
+  align-items: center;
+}
+
+.statement__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.statement__text {
+  text-wrap: balance;
+  font-size: 44px;
+  line-height: 1.22;
+  letter-spacing: -0.026em;
+  font-weight: 500;
+}
+
+.statement__list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-size: 24px;
+  line-height: 1.4;
+  color: var(--muted);
+  counter-reset: point;
+}
+
+.statement__list li {
+  padding-left: 46px;
+  position: relative;
+  counter-increment: point;
+}
+
+.statement__list li::before {
+  content: counter(point, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+}
+
+.statement__listhead {
+  display: block;
+  font-size: 26px;
+  letter-spacing: -0.015em;
+  color: var(--paper);
+  margin-bottom: 4px;
+}
+
+/* Art still to come: the column holds its half of the stage regardless. */
+.statement__slot {
+  align-self: stretch;
+}
+
+.boxgrid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.boxgrid__cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 148px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--surface);
+  font-size: 30px;
+  letter-spacing: -0.015em;
+}
