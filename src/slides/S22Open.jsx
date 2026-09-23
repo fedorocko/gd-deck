@@ -1,8 +1,16 @@
+import Mark from '../components/Mark.jsx'
 import StatementLayout from '../layouts/StatementLayout.jsx'
 
 export default function S22Open() {
   return (
-    <StatementLayout statement="But fully open for external integration and no lock-ins." />
+    <StatementLayout
+      statement={
+        <>
+          But does not lock you in and is fully <Mark>open</Mark> to external
+          integration.
+        </>
+      }
+    />
   )
 }
 

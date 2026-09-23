@@ -1,9 +1,15 @@
+import Mark from '../components/Mark.jsx'
 import StatementLayout from '../layouts/StatementLayout.jsx'
 
 export default function S29Context() {
   return (
     <StatementLayout
-      statement="All applications run on shared definitions and multi-layer context."
+      statement={
+        <>
+          All UI apps and agents run on definitions and context{' '}
+          <Mark>specific to your business</Mark>.
+        </>
+      }
       list={[
         {
           head: 'Data Context',
@@ -11,11 +17,11 @@ export default function S29Context() {
         },
         {
           head: 'Business Context',
-          body: 'Centrally and customer-curated knowledge and memories.',
+          body: 'Customer-curated and auto-generated knowledge and memories.',
         },
         {
-          head: 'Personalized Instructions',
-          body: 'Tailored for each individual agent.',
+          head: 'Agent Context',
+          body: 'Skills and personality tailored for each individual agent.',
         },
       ]}
     />

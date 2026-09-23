@@ -1,6 +1,9 @@
 import { useMemo, useState } from 'react'
+import asset from '../asset.js'
+import { ICONS } from '../schema/model.js'
 import {
   MODELS,
+  ORDER,
   uncovered,
   VIEW_H,
   VIEW_W,
@@ -23,6 +26,11 @@ import {
  * The choreography is staged through transition delays, in the order a viewer
  * can follow: the existing boxes shift to make room, the viewport slides to
  * re-centre, and only then do the newly uncovered boxes fade up.
+ *
+ * Everything renders from `ORDER`, never from the state's own maps. DOM order
+ * has to stay fixed: React moves a reordered element, and re-inserting an
+ * element cancels its CSS transition, which makes the box jump to its new
+ * position instead of travelling there.
  */
 
 /** Long enough for the boxes to have moved before anything new appears. */
@@ -56,19 +64,22 @@ export default function Schema({ state }) {
           transform: `translateY(${model.offset}px)`,
         }}
       >
-        {[...model.frames.values()].map((f) => (
-          <div
-            key={f.id}
-            className="sx-frame"
-            style={{
-              transform: `translate(${f.x}px, ${f.y}px)`,
-              width: f.w,
-              height: f.h,
-              opacity: f.visible ? 1 : 0,
-              '--d': delay(f.id),
-            }}
-          />
-        ))}
+        {ORDER.frames.map((id) => {
+          const f = model.frames.get(id)
+          return (
+            <div
+              key={id}
+              className="sx-frame"
+              style={{
+                transform: `translate(${f.x}px, ${f.y}px)`,
+                width: f.w,
+                height: f.h,
+                opacity: f.visible ? 1 : 0,
+                '--d': delay(id),
+              }}
+            />
+          )
+        })}
 
         <svg
           className="sx-arrows"
@@ -89,50 +100,87 @@ export default function Schema({ state }) {
               <path d="M 0 1 L 9 5 L 0 9 z" className="sx-arrows__head" />
             </marker>
           </defs>
-          {[...model.arrows.values()].map((a) => (
-            <path
-              key={a.id}
-              d={a.d}
-              markerEnd={a.head ? 'url(#sx-head)' : undefined}
-              style={{ opacity: a.visible ? 1 : 0, '--d': delay(a.id) }}
-            />
-          ))}
+          {ORDER.arrows.map((id) => {
+            const a = model.arrows.get(id)
+            return (
+              <path
+                key={id}
+                d={a.d}
+                markerEnd={a.head ? 'url(#sx-head)' : undefined}
+                style={{ opacity: a.visible ? 1 : 0, '--d': delay(id) }}
+              />
+            )
+          })}
         </svg>
 
-        {[...model.labels.values()].map((l) => (
-          <div
-            key={l.id}
-            className={`sx-label${l.kind === 'arrow' ? ' sx-label--arrow' : ''}${
-              l.hl ? ' sx-label--hl' : ''
-            }`}
-            style={{
-              transform: `translate(${l.x}px, ${l.y}px)`,
-              width: l.w,
-              opacity: l.visible ? 1 : 0,
-              '--d': delay(l.id),
-            }}
-          >
-            {l.text}
-          </div>
-        ))}
+        {ORDER.labels.map((id) => {
+          const l = model.labels.get(id)
+          return (
+            <div
+              key={id}
+              className={`sx-label${l.kind === 'arrow' ? ' sx-label--arrow' : ''}${
+                l.hl ? ' sx-label--hl' : ''
+              }`}
+              style={{
+                transform: `translate(${l.x}px, ${l.y}px)`,
+                width: l.w,
+                opacity: l.visible ? 1 : 0,
+                '--d': delay(id),
+              }}
+            >
+              {l.text}
+            </div>
+          )
+        })}
 
-        {[...model.nodes.values()].map((n) => (
-          <div
-            key={n.id}
-            className={`sx${n.hl ? ' sx--hl' : ''}`}
-            style={{
-              transform: `translate(${n.x}px, ${n.y}px)`,
-              width: n.w,
-              height: n.h,
-              fontSize: n.font,
-              borderRadius: n.radius,
-              opacity: n.visible ? 1 : 0,
-              '--d': delay(n.id),
-            }}
-          >
-            {n.label}
-          </div>
-        ))}
+        {ORDER.nodes.map((id) => {
+          const n = model.nodes.get(id)
+          const icon = ICONS[id]
+          // A card's picture is a box like any other, with art in place of a
+          // label; until the art is supplied it holds its space as a hatch.
+          const pic = n.art !== undefined
+          const cls = [
+            'sx',
+            n.hl && 'sx--hl',
+            n.badge && 'sx--badge',
+            icon && 'sx--icon',
+            pic && 'sx--pic',
+            pic && !n.art && 'sx--empty',
+          ]
+            .filter(Boolean)
+            .join(' ')
+
+          return (
+            <div
+              key={id}
+              className={cls}
+              style={{
+                transform: `translate(${n.x}px, ${n.y}px)`,
+                width: n.w,
+                height: n.h,
+                fontSize: n.font,
+                borderRadius: n.radius,
+                opacity: n.visible ? 1 : 0,
+                '--d': delay(id),
+              }}
+            >
+              {n.art && <img className="sx__pic" src={asset(n.art)} alt="" />}
+              {icon && (
+                <img
+                  className="sx__icon"
+                  src={asset(icon)}
+                  alt=""
+                  // Art named in ICONS but not yet dropped into public/media
+                  // leaves its space empty rather than a broken-image glyph.
+                  onError={(e) => {
+                    e.currentTarget.style.visibility = 'hidden'
+                  }}
+                />
+              )}
+              {n.label}
+            </div>
+          )
+        })}
       </div>
     </div>
   )

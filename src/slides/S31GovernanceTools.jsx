@@ -1,14 +1,15 @@
+import Mark from '../components/Mark.jsx'
 import StatementLayout from '../layouts/StatementLayout.jsx'
 
 export default function S31GovernanceTools() {
   return (
     <StatementLayout
-      statement="Governance tools give you centralized control across all layers."
-      list={[
-        'Data Governance (Catalog)',
-        'Context Governance (AI Hub)',
-        'Agent Governance (Agent Builder)',
-      ]}
+      statement={
+        <>
+          Governance tools give you <Mark>centralized control</Mark> across
+          data, context and agents.
+        </>
+      }
     />
   )
 }

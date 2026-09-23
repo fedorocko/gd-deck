@@ -23,7 +23,21 @@ export const TIERS = {
   3: { h: 60, font: 17, radius: 10, inset: 40 },
 }
 
-const box = (id, label, tier) => ({ id, label, tier })
+const box = (id, label, tier, extra) => ({ id, label, tier, ...extra })
+
+/**
+ * A badge keeps its tier's width and gives up its height: it names one thing
+ * rather than standing for a layer, so a single line is all it needs.
+ */
+const BADGE = { h: 46, font: 17, radius: 10, badge: true }
+
+/**
+ * A card is a badge with a picture above it — one tree node, drawn as two
+ * rectangles. `art` is the image it shows; null holds the space as a
+ * placeholder until the art is supplied.
+ */
+const card = (id, label, tier, art = null) =>
+  box(id, label, tier, { ...BADGE, art })
 
 // ------------------------------------------------------------------ the tree
 // `kids` describes how a box's children are arranged once it is unfolded:
@@ -31,7 +45,9 @@ const box = (id, label, tier) => ({ id, label, tier })
 //   row     — side by side, sharing the tier's width
 //   columns — side by side, each column optionally titled and holding a stack
 //   branch  — one full-width lead box, then columns hanging below it
-// `tailGap` reserves room under a row for an arrow into the next sibling.
+//   sections— titled bands stacked up, each holding a row of equal items
+// `tailGap` reserves room under a row for an arrow into the next sibling, and
+// `gap` widens the space between a row's items to make room for arrows in it.
 
 export const TREE = {
   id: 'root',
@@ -41,15 +57,19 @@ export const TREE = {
       {
         ...box('interfaces', 'Interfaces', 1),
         kids: {
-          layout: 'columns',
-          columns: [
+          layout: 'sections',
+          sections: [
             {
               label: 'Built-in',
-              items: [box('uiapps', 'UI Apps', 2), box('agents', 'Agents', 2)],
+              items: [
+                card('copilot', 'Dashboard Copilot', 2),
+                card('analyst', 'AI Analyst', 2),
+                card('publisher', 'AI Publisher', 2),
+              ],
             },
             {
               label: 'Building blocks',
-              items: [box('sdk', 'SDK', 2), box('mcp', 'MCP', 2)],
+              items: [box('sdk', 'SDK', 2, BADGE), box('mcp', 'MCP', 2, BADGE)],
             },
           ],
         },
@@ -94,9 +114,9 @@ export const TREE = {
               kids: {
                 layout: 'columns',
                 columns: [
-                  { label: 'Data', items: [box('catalog', 'Catalog', 3)] },
-                  { label: 'Business', items: [box('aihub', 'AI Hub', 3)] },
-                  { label: 'Agents', items: [box('builder', 'Builder', 3)] },
+                  { label: 'Data', items: [card('catalog', 'Catalog', 3)] },
+                  { label: 'Business', items: [card('aihub', 'AI Hub', 3)] },
+                  { label: 'Agents', items: [card('builder', 'Builder', 3)] },
                 ],
               },
             },
@@ -104,6 +124,9 @@ export const TREE = {
               ...box('life', 'Lifecycle Management', 2),
               kids: {
                 layout: 'row',
+                // wider than the usual column gap: the arrows that run between
+                // the three have to fit in it
+                gap: 36,
                 items: [
                   box('evaluations', 'Evaluations', 3),
                   box('observability', 'Observability', 3),
@@ -162,6 +185,24 @@ export const TREE = {
 }
 
 /**
+ * Art for the three layers, keyed by box id.
+ *
+ * Only the tier-1 boxes carry one: the icon is what makes a layer recognisable
+ * at a glance, and repeating it further down the tree would compete with the
+ * labels rather than help them. The tenant copies in the multi-tenant state go
+ * without it too — at that size the icon and the label would collide.
+ */
+export const ICONS = {
+  interfaces: '/media/icon-interface.png',
+  mgmt: '/media/icon-management.png',
+  infra: '/media/icon-Infrastructure.png',
+  // the two building blocks carry a small one at badge size; until the files
+  // land the badge simply shows nothing where the icon will sit
+  sdk: '/media/icon-box.png',
+  mcp: '/media/icon-plug.png',
+}
+
+/**
  * Boxes that exist only in the multi-tenant state. `from` names the box they
  * collapse into everywhere else, so a tenant copy grows out of the original
  * rather than arriving from nowhere.
@@ -181,6 +222,8 @@ export const CLONES = [
 // focus  — what the viewport centres on: `sub` takes a box with everything
 //          unfolded beneath it, `box` takes the box alone
 // widths — narrows named boxes to leave room for the arrows beside them
+// arrows — which set of arrows this state draws; `flow` runs one from each box
+//          named in `flow` to the next
 
 export const STATES = {
   box: {
@@ -191,7 +234,7 @@ export const STATES = {
 
   builtin: {
     expand: ['interfaces'],
-    hl: ['interfaces', 'uiapps', 'agents', 'sdk', 'mcp'],
+    hl: ['interfaces', 'copilot', 'analyst', 'publisher', 'sdk', 'mcp'],
     focus: { sub: ['interfaces'] },
   },
 
@@ -224,6 +267,8 @@ export const STATES = {
   lifecycle: {
     expand: ['mgmt', 'life'],
     hl: ['life', 'evaluations', 'observability', 'selflearning'],
+    arrows: 'flow',
+    flow: ['evaluations', 'observability', 'selflearning'],
     focus: { sub: ['mgmt'], box: ['infra'] },
   },
 
@@ -244,7 +289,7 @@ export const STATES = {
 
   open: {
     expand: ['infra'],
-    hl: [],
+    hl: ['inference', 'compute', 'storage'],
     widths: { inference: 336, compute: 336, storage: 336 },
     arrows: 'open',
     focus: { sub: ['infra'] },

@@ -1,14 +1,15 @@
+import Mark from '../components/Mark.jsx'
 import StatementLayout from '../layouts/StatementLayout.jsx'
 
 export default function S30Management() {
   return (
     <StatementLayout
-      statement="ASP management tools help you launch new applications with confidence. They include tools for:"
-      list={[
-        'Context Management',
-        'Governance & Control',
-        'Lifecycle Management',
-      ]}
+      statement={
+        <>
+          Management tools help you configure and launch new AI use-cases to
+          production with <Mark>confidence</Mark>.
+        </>
+      }
     />
   )
 }

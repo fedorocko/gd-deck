@@ -23,6 +23,14 @@ const LABEL_GAP = 8
 /** Extra air above a column title, so it reads as a title and not as a caption
     stuck to the underside of the box it hangs from. */
 const LABEL_LEAD = 10
+/** Air between two titled bands. The title carries its own lead above it, so
+    this only has to part the bands, not re-state the gap. */
+const SECTION_GAP = 8
+/** A card's picture: its height as a share of its width, and the air between
+    it and the badge it names. Sizing the picture off the column keeps every
+    card the same shape whatever the row's width works out to. */
+const ART_RATIO = 0.62
+const ART_GAP = 10
 
 /** The slot the diagram occupies on the 1600x900 stage. */
 export const VIEW_X = 848
@@ -42,22 +50,47 @@ const area = (tier) => ({
 
 // ------------------------------------------------------------------- walking
 
+/** A card's picture shares the badge's id, so the two travel together. */
+const artId = (id) => `${id}:art`
+
 function placeNode(node, state, x, y, w, out) {
   const t = TIERS[node.tier]
+  let top = y
+
+  if (node.art !== undefined) {
+    const h = Math.round(w * ART_RATIO)
+    out.nodes.set(artId(node.id), {
+      id: artId(node.id),
+      label: '',
+      x,
+      y: top,
+      w,
+      h,
+      font: t.font,
+      radius: 14,
+      art: node.art,
+      hl: false,
+      visible: true,
+    })
+    top += h + ART_GAP
+  }
+
+  const h = node.h ?? t.h
   out.nodes.set(node.id, {
     id: node.id,
     label: node.label,
     x,
-    y,
+    y: top,
     w,
-    h: t.h,
-    font: t.font,
-    radius: t.radius,
+    h,
+    font: node.font ?? t.font,
+    radius: node.radius ?? t.radius,
+    badge: node.badge,
     hl: state.hl.includes(node.id),
     visible: true,
   })
 
-  const bottom = y + t.h
+  const bottom = top + h
   if (node.kids && state.expand.includes(node.id)) {
     const drop = PARENT_GAP + (state.dropKids?.[node.id] ?? 0)
     return placeKids(node, state, bottom + drop, out)
@@ -80,10 +113,11 @@ function placeKids(node, state, y, out) {
 
   if (k.layout === 'row') {
     const a = area(k.items[0].tier)
-    const cw = (a.w - COL_GAP * (k.items.length - 1)) / k.items.length
+    const gap = k.gap ?? COL_GAP
+    const cw = (a.w - gap * (k.items.length - 1)) / k.items.length
     let bottom = y
     k.items.forEach((child, i) => {
-      const cx = a.x + i * (cw + COL_GAP)
+      const cx = a.x + i * (cw + gap)
       bottom = Math.max(bottom, placeNode(child, state, cx, y, cw, out))
     })
     return bottom + (k.tailGap ?? 0)
@@ -91,6 +125,10 @@ function placeKids(node, state, y, out) {
 
   if (k.layout === 'columns') {
     return placeColumns(node.id, k.columns, state, y, out)
+  }
+
+  if (k.layout === 'sections') {
+    return placeSections(node.id, k.sections, state, y, out)
   }
 
   if (k.layout === 'branch') {
@@ -134,6 +172,47 @@ function placeColumns(ownerId, columns, state, y, out) {
   })
 
   return bottom
+}
+
+/**
+ * Titled bands stacked one under another, each holding a row of equal items.
+ *
+ * The difference from `columns` is where the title sits: here it spans the
+ * whole band, so it reads as the name of a group of siblings rather than as a
+ * heading over the first of them.
+ */
+function placeSections(ownerId, sections, state, y, out) {
+  const hl = state.hl.includes(ownerId)
+  let cy = y
+
+  sections.forEach((sec, si) => {
+    if (si) cy += SECTION_GAP
+    const a = area(sec.items[0].tier)
+
+    if (sec.label) {
+      const titleY = cy + LABEL_LEAD
+      out.labels.set(`${ownerId}:s${si}`, {
+        id: `${ownerId}:s${si}`,
+        text: sec.label,
+        x: a.x,
+        y: titleY,
+        w: a.w,
+        hl,
+        visible: true,
+      })
+      cy = titleY + LABEL_H + LABEL_GAP
+    }
+
+    const cw = (a.w - COL_GAP * (sec.items.length - 1)) / sec.items.length
+    let bottom = cy
+    sec.items.forEach((child, i) => {
+      const cx = a.x + i * (cw + COL_GAP)
+      bottom = Math.max(bottom, placeNode(child, state, cx, cy, cw, out))
+    })
+    cy = bottom
+  })
+
+  return cy
 }
 
 // ------------------------------------------------------- the multi-tenant view
@@ -233,17 +312,34 @@ function parkHidden(node, out, anchor) {
   if (!rect) {
     const t = TIERS[node.tier]
     const base = anchor ?? { x: 0, y: 0, w: COL_W, h: 0 }
-    out.nodes.set(node.id, {
-      id: node.id,
-      label: node.label,
+    const parked = {
       x: base.x,
       y: base.y + base.h - 10,
       w: base.w,
-      h: t.h,
-      font: t.font,
-      radius: t.radius,
       hl: false,
       visible: false,
+    }
+
+    if (node.art !== undefined) {
+      out.nodes.set(artId(node.id), {
+        id: artId(node.id),
+        label: '',
+        h: Math.round(base.w * ART_RATIO),
+        font: t.font,
+        radius: 14,
+        art: node.art,
+        ...parked,
+      })
+    }
+
+    out.nodes.set(node.id, {
+      id: node.id,
+      label: node.label,
+      h: node.h ?? t.h,
+      font: node.font ?? t.font,
+      radius: node.radius ?? t.radius,
+      badge: node.badge,
+      ...parked,
     })
   }
 
@@ -256,6 +352,7 @@ function childrenOf(node) {
   if (node.kids?.lead) kids.push(node.kids.lead)
   node.kids?.items?.forEach((c) => kids.push(c))
   node.kids?.columns?.forEach((col) => col.items.forEach((c) => kids.push(c)))
+  node.kids?.sections?.forEach((sec) => sec.items.forEach((c) => kids.push(c)))
   return kids
 }
 
@@ -279,6 +376,9 @@ function parkClones(out) {
 }
 
 // --------------------------------------------------------------- decorations
+
+/** Air an arrow leaves between its ends and the boxes it runs between. */
+const FLOW_PAD = 5
 
 const cx = (r) => r.x + r.w / 2
 const arrow = (out, id, d, extra = {}) =>
@@ -336,6 +436,17 @@ function addArrows(state, out) {
         visible: true,
       })
     }
+    return
+  }
+
+  if (state.arrows === 'flow') {
+    state.flow.forEach((id, i) => {
+      const a = out.nodes.get(id)
+      const b = out.nodes.get(state.flow[i + 1])
+      if (!b) return
+      const y = a.y + a.h / 2
+      arrow(out, `arrow:flow${i}`, `M ${a.x + a.w + FLOW_PAD} ${y} H ${b.x - FLOW_PAD}`)
+    })
     return
   }
 
@@ -514,3 +625,29 @@ export function uncovered(from, to) {
   const had = VISIBLE.get(from)
   return new Set([...arriving].filter((id) => !had.has(id)))
 }
+
+/**
+ * One fixed render order per collection.
+ *
+ * Each state builds its own maps, so their iteration order follows the shape of
+ * that state — Interfaces' children come before Management Tools once they are
+ * unfolded, and after it when they are not. Rendering straight from the map
+ * makes React reorder the DOM on a slide change, and re-inserting an element
+ * resets its CSS transition: the box snaps to its new place instead of
+ * travelling there. Rendering from a fixed order keeps every element put, so a
+ * state change only rewrites styles and the transitions actually run.
+ *
+ * Order is free to be arbitrary because the diagram is absolutely positioned;
+ * stacking is handled by the frames/arrows/labels/boxes grouping in the markup.
+ */
+export const ORDER = Object.fromEntries(
+  ['nodes', 'labels', 'frames', 'arrows'].map((kind) => {
+    const ids = []
+    for (const key of STATE_ORDER) {
+      for (const id of MODELS[key][kind].keys()) {
+        if (!ids.includes(id)) ids.push(id)
+      }
+    }
+    return [kind, ids]
+  }),
+)
