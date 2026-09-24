@@ -115,12 +115,19 @@ export default function Schema({ state }) {
 
         {ORDER.labels.map((id) => {
           const l = model.labels.get(id)
+          const cls = [
+            'sx-label',
+            l.kind === 'arrow' && 'sx-label--arrow',
+            l.kind === 'logos' && 'sx-label--logos',
+            l.hl && 'sx-label--hl',
+          ]
+            .filter(Boolean)
+            .join(' ')
+
           return (
             <div
               key={id}
-              className={`sx-label${l.kind === 'arrow' ? ' sx-label--arrow' : ''}${
-                l.hl ? ' sx-label--hl' : ''
-              }`}
+              className={cls}
               style={{
                 transform: `translate(${l.x}px, ${l.y}px)`,
                 width: l.w,
@@ -128,7 +135,11 @@ export default function Schema({ state }) {
                 '--d': delay(id),
               }}
             >
-              {l.text}
+              {l.logos
+                ? l.logos.map((src) => (
+                    <img key={src} src={asset(src)} alt="" />
+                  ))
+                : l.text}
             </div>
           )
         })}

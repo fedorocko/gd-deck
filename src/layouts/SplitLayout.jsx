@@ -1,12 +1,15 @@
 import Media from '../components/Media.jsx'
 import Badges from '../components/Badges.jsx'
+import Kpis from '../components/Kpis.jsx'
 
-/** Large text on the left, media on the right. */
+/** Large text on the left, media on the right.
+ *  kpis: [{ value, label }] — the numbers that back the claim up. */
 export default function SplitLayout({
   eyebrow,
   title,
   subtitle,
   kicker,
+  kpis,
   badges,
   mediaName,
   titleClass = 'h1',
@@ -24,6 +27,7 @@ export default function SplitLayout({
           <h2 className={titleClass}>{title}</h2>
           {subtitle && <p className="body">{subtitle}</p>}
           {kicker && <p className="kicker">{kicker}</p>}
+          {kpis && <Kpis items={kpis} />}
           {badges && <Badges items={badges} />}
         </div>
         <Media name={mediaName} className={cx('split__media')} />

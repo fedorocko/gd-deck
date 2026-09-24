@@ -274,14 +274,16 @@ li {
   color: var(--accent);
 }
 
+/* A badge carried inline. The padding is the pill's own air, left to sit on
+   top of the word spacing rather than being pulled back out of it, or the
+   pill's edge ends up almost touching the words either side. Pass `keep` with
+   this variant: a badge that breaks across two lines reads as a mistake. */
 .mk--pill {
   background: var(--accent);
   color: var(--ink);
-  /* the negative side margin pulls the pill's padding back out of the line, so
-     the words keep their spacing against the rest of the sentence */
-  padding: 0.06em 0.26em 0.1em;
-  margin: 0 -0.16em;
-  border-radius: 0.44em;
+  font-weight: 500;
+  padding: 0.14em 0.5em 0.18em;
+  border-radius: 999px;
 }
 
 .mk--wash {
@@ -289,7 +291,6 @@ li {
   background: var(--accent-wash);
   box-shadow: inset 0 0 0 1px var(--accent-line);
   padding: 0.06em 0.26em 0.1em;
-  margin: 0 -0.16em;
   border-radius: 0.26em;
 }
 
@@ -301,6 +302,54 @@ li {
   background-size: 100% 0.07em;
   background-position: 0 96%;
   padding-bottom: 0.06em;
+}
+
+/* ---------------------------------------------------------------- cards  */
+/* The boxes take two thirds and the figures stand apart on the last third:
+   evidence for the slide as a whole rather than a footnote to one claim. */
+.cardsrow {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 64px;
+  align-items: center;
+}
+
+/* Claims side by side, each boxed. The box is the diagram's, so a summary
+   slide reads as part of the same system as the schema behind it. */
+.cards {
+  display: grid;
+  gap: 24px;
+}
+
+.cards--2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+.cards--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.cards--4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 28px;
+  padding: 36px 36px 40px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(244, 243, 239, 0.035);
+}
+
+/* The claim, in the words the slide it came from used — badges and all, so a
+   line is recognisable as one already heard. The loose leading is what keeps
+   a badge on the second line clear of the first. */
+.card__text {
+  font-size: 28px;
+  line-height: 1.8;
+  letter-spacing: -0.02em;
+  color: var(--paper);
 }
 
 /* ---------------------------------------------------------------- media  */
@@ -548,6 +597,27 @@ li {
   justify-content: center;
 }
 
+/**
+ * The internal pages, set on paper.
+ *
+ * `--ink` is the ground and `--paper` the mark on it, so inverting the slide
+ * is just swapping those two: everything inside keeps reading its colour from
+ * the tokens and none of it has to know it is on a light background. The
+ * accent has to be darkened by hand — the deck's lime is made to glow on
+ * black and all but disappears on white.
+ */
+.slide--invert {
+  --ink: #f4f3ef;
+  --paper: #0b0d0c;
+  --surface: #e7e5dd;
+  --line: rgba(11, 13, 12, 0.16);
+  --muted: rgba(11, 13, 12, 0.62);
+  --faint: rgba(11, 13, 12, 0.38);
+  --accent: #5f7d0d;
+  background: var(--ink);
+  color: var(--paper);
+}
+
 .sectionblock {
   display: flex;
   flex-direction: column;
@@ -752,6 +822,46 @@ li {
   font-weight: 500;
 }
 
+/* Set under the claim and a size down from it: the claim is what the slide
+   says, this is what it gets you. */
+.statement__note {
+  font-size: 28px;
+  /* loose enough that badges on consecutive lines clear each other: a pill is
+     taller than the text it holds */
+  line-height: 1.8;
+  letter-spacing: -0.02em;
+  color: var(--muted);
+}
+
+/* The numbers that back the note up. Set large and in the accent, because a
+   figure is the one thing on a slide a room will remember. */
+.kpis {
+  display: flex;
+  gap: 72px;
+  margin: 0;
+}
+
+.kpis--stack {
+  flex-direction: column;
+  gap: 52px;
+}
+
+.kpi__value {
+  font-size: 52px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--accent);
+}
+
+.kpi__label {
+  margin: 12px 0 0;
+  max-width: 220px;
+  font-size: 20px;
+  line-height: 1.35;
+  color: var(--muted);
+}
+
 .statement__list {
   display: flex;
   flex-direction: column;
@@ -760,6 +870,14 @@ li {
   line-height: 1.4;
   color: var(--muted);
   counter-reset: point;
+}
+
+/* Where the points are the slide's content and not a gloss on it: set in full
+   colour at the size a point's name would carry. */
+.statement__list--lead {
+  gap: 20px;
+  font-size: 28px;
+  color: var(--paper);
 }
 
 .statement__list li {
@@ -939,6 +1057,20 @@ li {
   font-size: 17px;
   letter-spacing: -0.01em;
   color: var(--paper);
+}
+
+/* A row of logos at the end of an arrow: who that layer opens out to. */
+.sx-label--logos {
+  height: 42px;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.sx-label--logos img {
+  width: 42px;
+  height: 42px;
+  display: block;
 }
 
 /* --------------------------------------------- grouping frames and arrows  */

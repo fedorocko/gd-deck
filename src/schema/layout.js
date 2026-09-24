@@ -98,12 +98,18 @@ function placeNode(node, state, x, y, w, out) {
   return bottom
 }
 
+/** The children this state actually draws. One left out is parked with the
+ *  rest of the folded-away boxes, so it still has somewhere to travel from. */
+const shown = (items, state) =>
+  state.hide ? items.filter((c) => !state.hide.includes(c.id)) : items
+
 function placeKids(node, state, y, out) {
   const k = node.kids
+  const tail = state.tails?.[node.id] ?? 0
 
   if (k.layout === 'stack') {
     let cy = y
-    k.items.forEach((child, i) => {
+    shown(k.items, state).forEach((child, i) => {
       if (i) cy += SIB_GAP[child.tier]
       const a = area(child.tier)
       cy = placeNode(child, state, a.x, cy, state.widths?.[child.id] ?? a.w, out)
@@ -112,15 +118,16 @@ function placeKids(node, state, y, out) {
   }
 
   if (k.layout === 'row') {
-    const a = area(k.items[0].tier)
+    const items = shown(k.items, state)
+    const a = area(items[0].tier)
     const gap = k.gap ?? COL_GAP
-    const cw = (a.w - gap * (k.items.length - 1)) / k.items.length
+    const cw = (a.w - gap * (items.length - 1)) / items.length
     let bottom = y
-    k.items.forEach((child, i) => {
+    items.forEach((child, i) => {
       const cx = a.x + i * (cw + gap)
       bottom = Math.max(bottom, placeNode(child, state, cx, y, cw, out))
     })
-    return bottom + (k.tailGap ?? 0)
+    return bottom + tail
   }
 
   if (k.layout === 'columns') {
@@ -129,6 +136,23 @@ function placeKids(node, state, y, out) {
 
   if (k.layout === 'sections') {
     return placeSections(node.id, k.sections, state, y, out)
+  }
+
+  if (k.layout === 'grid') {
+    const items = shown(k.items, state)
+    const first = items[0]
+    const a = area(first.tier)
+    const gap = k.gap ?? COL_GAP
+    const rowGap = k.rowGap ?? SIB_GAP[first.tier]
+    const cw = (a.w - gap * (k.cols - 1)) / k.cols
+    const rowH = first.h ?? TIERS[first.tier].h
+    let bottom = y
+    items.forEach((child, i) => {
+      const cx = a.x + (i % k.cols) * (cw + gap)
+      const cy = y + Math.floor(i / k.cols) * (rowH + rowGap)
+      bottom = Math.max(bottom, placeNode(child, state, cx, cy, cw, out))
+    })
+    return bottom + tail
   }
 
   if (k.layout === 'branch') {
@@ -408,6 +432,19 @@ const OPEN_LABELS = {
   storage: 'Other engines',
 }
 
+/** How far an arrow in the open state reaches, and the air after it. */
+const OPEN_ARROW = 104
+const LOGO_GAP = 16
+const LOGO_SIZE = 42
+
+/** Who each layer opens out to, drawn at the far end of its arrow. A layer
+ *  with nothing named simply has none. */
+const OPEN_LOGOS = {
+  inference: ['/media/icon-anthropic.png', '/media/icon-openai.png'],
+  compute: ['/media/icon-arrow.png'],
+  storage: ['/media/icon-databricks.png', '/media/icon-snowflake.png'],
+}
+
 function addArrows(state, out) {
   if (state.mode === 'tenants') {
     const bar = MASTER_H + 32
@@ -424,7 +461,7 @@ function addArrows(state, out) {
       const r = out.nodes.get(id)
       const y = r.y + r.h / 2
       const x0 = r.x + r.w + 18
-      arrow(out, `arrow:${id}`, `M ${x0} ${y} H ${x0 + 104}`)
+      arrow(out, `arrow:${id}`, `M ${x0} ${y} H ${x0 + OPEN_ARROW}`)
       out.labels.set(`arrow:${id}`, {
         id: `arrow:${id}`,
         text,
@@ -433,6 +470,19 @@ function addArrows(state, out) {
         w: 210,
         kind: 'arrow',
         hl: true,
+        visible: true,
+      })
+
+      const logos = OPEN_LOGOS[id]
+      if (!logos) continue
+      out.labels.set(`logos:${id}`, {
+        id: `logos:${id}`,
+        logos,
+        x: x0 + OPEN_ARROW + LOGO_GAP,
+        y: y - LOGO_SIZE / 2,
+        w: logos.length * LOGO_SIZE + (logos.length - 1) * 10,
+        kind: 'logos',
+        hl: false,
         visible: true,
       })
     }
@@ -451,15 +501,22 @@ function addArrows(state, out) {
   }
 
   if (state.arrows === 'merge') {
+    // A curve out of each engine, converging on one storage: the shape is the
+    // point of the slide. Only the engines this state shows are drawn, so a
+    // state that folds some away does not leave curves coming from nowhere.
     const store = out.nodes.get('storage')
     const tip = store.y - 16
     const mid = COL_W / 2
-    for (const id of ['mpp', 'inmemory']) {
-      const r = out.nodes.get(id)
+    const engines = DESCENDANTS.get('compute')
+      .filter((id) => id !== 'compute')
+      .map((id) => out.nodes.get(id))
+      .filter((r) => r.visible)
+
+    for (const r of engines) {
       const start = r.y + r.h
       arrow(
         out,
-        `arrow:${id}`,
+        `arrow:${r.id}`,
         `M ${cx(r)} ${start} C ${cx(r)} ${start + 28} ${mid} ${tip - 26} ${mid} ${tip}`,
         { head: false },
       )

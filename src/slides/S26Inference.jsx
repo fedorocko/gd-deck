@@ -1,3 +1,4 @@
+import Mark from '../components/Mark.jsx'
 import StatementLayout from '../layouts/StatementLayout.jsx'
 
 export default function S26Inference() {
@@ -9,6 +10,13 @@ export default function S26Inference() {
         'Caching outputs',
         'Building personalized profiles',
       ]}
+      note={
+        <>
+          We give you{' '}
+          <Mark keep>predictable spend</Mark> on your AI tokens.
+        </>
+      }
+      kpis={[{ value: '20%', label: 'savings on token costs' }]}
     />
   )
 }

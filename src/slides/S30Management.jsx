@@ -6,7 +6,7 @@ export default function S30Management() {
     <StatementLayout
       statement={
         <>
-          Management tools help you configure and launch new AI use-cases to
+          Management tools help you configure and launch new solutions to
           production with <Mark>confidence</Mark>.
         </>
       }

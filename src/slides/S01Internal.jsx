@@ -29,6 +29,7 @@ const arc = [
 export default function S01Internal() {
   return (
     <SectionLayout
+      invert
       flag="Internal — not for client"
       eyebrow="How I position this"
       title="They don’t yet know why they need it."

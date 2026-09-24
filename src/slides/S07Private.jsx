@@ -5,7 +5,11 @@ export default function S07Private() {
     <SplitLayout
       title="It keeps everything private."
       subtitle="So your data and IP are air-gapped and costs stay under control."
-      badges={['On-Premise Deployment', 'Kubernetes', 'Private Cloud', 'Local Inferences']}
+      badges={[
+        'On-Premise Deployment',
+        'Private Cloud',
+        'Local Inferences',
+      ]}
       mediaName="pillarPrivate"
     />
   )

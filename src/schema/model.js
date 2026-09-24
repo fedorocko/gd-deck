@@ -46,7 +46,7 @@ const card = (id, label, tier, art = null) =>
 //   columns — side by side, each column optionally titled and holding a stack
 //   branch  — one full-width lead box, then columns hanging below it
 //   sections— titled bands stacked up, each holding a row of equal items
-// `tailGap` reserves room under a row for an arrow into the next sibling, and
+//   grid    — `cols` across and as many rows down as the items need
 // `gap` widens the space between a row's items to make room for arrows in it.
 
 export const TREE = {
@@ -153,13 +153,13 @@ export const TREE = {
                   {
                     items: [
                       box('modelA', 'Model', 3),
-                      box('profileA', 'Profile', 3),
+                      box('profileA', 'Customer Profile', 3),
                     ],
                   },
                   {
                     items: [
                       box('modelB', 'Model', 3),
-                      box('profileB', 'Profile', 3),
+                      box('profileB', 'Customer Profile', 3),
                     ],
                   },
                 ],
@@ -168,15 +168,28 @@ export const TREE = {
             {
               ...box('compute', 'Compute', 2),
               kids: {
-                layout: 'row',
-                tailGap: 44,
+                // two by two rather than four across: at a quarter of the
+                // column "Massive-parallel processing" would break three ways
+                layout: 'grid',
+                cols: 2,
                 items: [
-                  box('mpp', 'MPP', 3),
-                  box('inmemory', 'In-Memory', 3),
+                  box('mpp', 'Massive-parallel processing', 3, BADGE),
+                  box('inmemory', 'In-memory', 3, BADGE),
+                  box('aisearch', 'AI search', 3, BADGE),
+                  box('realtime', 'Real-time', 3, BADGE),
                 ],
               },
             },
-            box('storage', 'Storage', 2),
+            {
+              ...box('storage', 'Storage', 2),
+              kids: {
+                layout: 'row',
+                items: [
+                  box('structured', 'Structured data', 3, BADGE),
+                  box('documents', 'Documents', 3, BADGE),
+                ],
+              },
+            },
           ],
         },
       },
@@ -196,10 +209,15 @@ export const ICONS = {
   interfaces: '/media/icon-interface.png',
   mgmt: '/media/icon-management.png',
   infra: '/media/icon-Infrastructure.png',
-  // the two building blocks carry a small one at badge size; until the files
-  // land the badge simply shows nothing where the icon will sit
+  // the building blocks and the engines carry a small one at badge size
   sdk: '/media/icon-box.png',
   mcp: '/media/icon-plug.png',
+  mpp: '/media/icon-mpp.png',
+  inmemory: '/media/icon-memory.png',
+  aisearch: '/media/icon-search.png',
+  realtime: '/media/icon-time.png',
+  structured: '/media/icon-table.png',
+  documents: '/media/icon-documents.png',
 }
 
 /**
@@ -224,6 +242,8 @@ export const CLONES = [
 // widths — narrows named boxes to leave room for the arrows beside them
 // arrows — which set of arrows this state draws; `flow` runs one from each box
 //          named in `flow` to the next
+// hide   — boxes this state leaves folded away though their parent is open
+// tails  — extra air under a box's children, where this state puts an arrow
 
 export const STATES = {
   box: {
@@ -282,8 +302,19 @@ export const STATES = {
   },
 
   infra: {
-    expand: ['infra'],
-    hl: ['infra', 'inference', 'compute', 'storage'],
+    expand: ['infra', 'compute', 'storage'],
+    hl: [
+      'infra',
+      'inference',
+      'compute',
+      'mpp',
+      'inmemory',
+      'aisearch',
+      'realtime',
+      'storage',
+      'structured',
+      'documents',
+    ],
     focus: { sub: ['infra'] },
   },
 
@@ -307,7 +338,9 @@ export const STATES = {
 
   separation: {
     expand: ['infra', 'compute'],
+    hide: ['aisearch', 'realtime'],
     hl: ['compute', 'mpp', 'inmemory', 'storage'],
+    tails: { compute: 44 },
     arrows: 'merge',
     focus: { sub: ['infra'] },
   },

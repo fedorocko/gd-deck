@@ -3,7 +3,7 @@ import SectionLayout from '../layouts/SectionLayout.jsx'
 export default function S14Launch() {
   return (
     <SectionLayout
-      eyebrow="Capabilities"
+      eyebrow="Architecture"
       title="Agentic Serving Plane capabilities"
     >
       <p className="kicker">

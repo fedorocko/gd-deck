@@ -4,11 +4,17 @@ import StatementLayout from '../layouts/StatementLayout.jsx'
 export default function S28BuiltIn() {
   return (
     <StatementLayout
-      statement={
+      statement="Interfaces contains:"
+      listLead
+      list={[
+        'Ready-made UI apps and agents',
+        'Composable building blocks for creating your own experiences',
+      ]}
+      note={
         <>
-          Interfaces contains <Mark keep>ready-made</Mark> UI apps and agents, plus
-          composable <Mark>building blocks</Mark> for creating your own
-          experiences.
+          We help you build{' '}
+          <Mark keep>new use-cases</Mark> and become an{' '}
+          <Mark keep>AI leader</Mark>.
         </>
       }
     />
