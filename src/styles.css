@@ -1,22 +1,28 @@
 /* ---------------------------------------------------------------- tokens */
+/* Colours and type follow gooddata.ai: near-black ground with an olive cast,
+   GoodData lime as the one loud colour, magenta as the rare second. */
 :root {
-  --ink: #0b0d0c;
-  --surface: #141817;
-  --line: rgba(244, 243, 239, 0.12);
-  --paper: #f4f3ef;
-  --muted: rgba(244, 243, 239, 0.56);
-  --faint: rgba(244, 243, 239, 0.3);
-  --accent: #c6f24e;
-  --accent-2: #7cc7ff;
+  --ink: #09090c;
+  --surface: #15171a;
+  --line: rgba(255, 255, 255, 0.12);
+  --paper: #fafaf7;
+  --muted: rgba(250, 250, 247, 0.62);
+  --faint: rgba(250, 250, 247, 0.36);
+  --accent: #dafe85;
+  --accent-2: #ed26b7;
   /* the accent thinned out, for the schema's highlighted fills and strokes */
-  --accent-wash: rgba(198, 242, 78, 0.12);
-  --accent-line: rgba(198, 242, 78, 0.5);
+  --accent-wash: rgba(218, 254, 133, 0.12);
+  --accent-line: rgba(218, 254, 133, 0.5);
+  /* the olive of the homepage hero, for the ground's glow and grid */
+  --olive: #2b3320;
+  --grid: rgba(122, 141, 78, 0.16);
 
   --ease-move: cubic-bezier(0.22, 0.8, 0.3, 1);
 
   --pad: 120px;
-  --font: 'Inter Tight', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica,
+  --font: 'Switzer', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica,
     Arial, sans-serif;
+  --font-display: 'Funnel Display', 'Switzer', Helvetica, Arial, sans-serif;
 }
 
 *,
@@ -58,14 +64,17 @@ li {
   inset: 0;
   overflow: hidden;
   background: #000;
+}
+
+/* While presenting, slide content is inert: no selection, hover states, links
+   or text cursor. Clicks fall through to the deck, which advances the slide. */
+.deck--presenting {
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
 }
 
-/* Slide content is inert: no hover states, links or text cursor. Clicks fall
-   through to the deck, which advances the slide. */
-.stage * {
+.deck--presenting .stage * {
   pointer-events: none;
 }
 
@@ -76,7 +85,11 @@ li {
   flex: none;
   position: relative;
   overflow: hidden;
-  background: var(--ink);
+  /* the homepage hero: an olive glow from the top over a faint square grid */
+  background:
+    linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 160px 160px,
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 160px 160px,
+    radial-gradient(120% 90% at 50% 0%, var(--olive) 0%, #121410 55%, var(--ink) 100%);
   position: absolute;
   top: 50%;
   left: 50%;
@@ -170,28 +183,43 @@ li {
 }
 
 /* ------------------------------------------------------------ type scale */
+/* Headlines are set in Funnel Display, like the homepage; everything else
+   stays in Switzer. */
+.display,
+.h1,
+.h2,
+.h3,
+.colhead,
+.titleblock__sub--lead,
+.sub-lede,
+.hero__headline,
+.statement__text,
+.kpi__value {
+  font-family: var(--font-display);
+}
+
 .display {
   text-wrap: balance;
   font-size: 112px;
   line-height: 1;
-  letter-spacing: -0.035em;
-  font-weight: 500;
+  letter-spacing: -0.02em;
+  font-weight: 600;
 }
 
 .h1 {
   text-wrap: balance;
   font-size: 84px;
-  line-height: 1.02;
-  letter-spacing: -0.032em;
-  font-weight: 500;
+  line-height: 1.04;
+  letter-spacing: -0.018em;
+  font-weight: 600;
 }
 
 .h2 {
   text-wrap: balance;
   font-size: 64px;
-  line-height: 1.06;
-  letter-spacing: -0.03em;
-  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  font-weight: 600;
 }
 
 /* A heading that must read as one line: no wrap, set down to clear the pad. */
@@ -204,16 +232,16 @@ li {
 .h3 {
   text-wrap: balance;
   font-size: 56px;
-  line-height: 1.08;
-  letter-spacing: -0.028em;
-  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  font-weight: 600;
 }
 
 .colhead {
   font-size: 40px;
   line-height: 1.1;
-  letter-spacing: -0.025em;
-  font-weight: 500;
+  letter-spacing: -0.012em;
+  font-weight: 600;
 }
 
 .body {
@@ -225,10 +253,18 @@ li {
 
 .eyebrow {
   font-size: 18px;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--faint);
   font-weight: 500;
+}
+
+/* Bracketed, as the homepage sets its small caps: [ IN YOUR CLOUD ] */
+.eyebrow::before {
+  content: '[\00a0\00a0';
+}
+.eyebrow::after {
+  content: '\00a0\00a0]';
 }
 
 .kicker {
@@ -473,6 +509,17 @@ li {
   margin: auto auto 0;
 }
 
+/* Under display heads the copy gets room to breathe before the art, and the
+   art gives up some size to make that room. */
+.cols--display .col__body,
+.cols--display .col__list {
+  margin-bottom: 40px;
+}
+
+.cols--display .col__icon--below {
+  width: calc(100% - 70px);
+}
+
 /* Reserved room for art not yet placed: same box col__icon--below would fill. */
 .col__slot {
   display: block;
@@ -516,13 +563,14 @@ li {
 .col__list li {
   padding-left: 22px;
   position: relative;
+  line-height: 1.5;
 }
 
 .col__list li::before {
   content: '';
   position: absolute;
   left: 0;
-  top: 13px;
+  top: 17px;
   width: 8px;
   height: 1px;
   background: var(--accent);
@@ -533,6 +581,12 @@ li {
   flex-direction: column;
   gap: 18px;
   margin-bottom: 76px;
+}
+
+/* A display-column slide is tall below its heading, so the heading sits
+   closer to the columns it introduces. */
+.slide:has(.cols--display) .slidehead {
+  margin-bottom: 40px;
 }
 
 .slidehead .kicker {
@@ -811,7 +865,7 @@ li {
 
 .tax__node--t2 {
   height: 34px;
-  width: 188px;
+  width: 184px;
   font-size: 18px;
 }
 
@@ -825,12 +879,12 @@ li {
   height: 34px;
   display: inline-flex;
   align-items: center;
-  padding: 0 12px;
+  padding: 0 10px;
   border-radius: 999px;
   border: 1px solid var(--line);
   background: var(--surface);
   color: var(--muted);
-  font-size: 15px;
+  font-size: 14px;
   white-space: nowrap;
 }
 
@@ -1284,14 +1338,14 @@ li {
   font: 600 16px/1 var(--font);
   letter-spacing: 0.01em;
   cursor: pointer;
-  box-shadow: 0 8px 28px rgba(124, 199, 255, 0.35);
+  box-shadow: 0 8px 28px rgba(237, 38, 183, 0.35);
   transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
   z-index: 10;
 }
 
 .present:hover {
-  background: #9dd5ff;
-  box-shadow: 0 10px 36px rgba(124, 199, 255, 0.5);
+  background: #f24cc6;
+  box-shadow: 0 10px 36px rgba(237, 38, 183, 0.5);
   transform: translateX(-50%) scale(1.04);
 }
 

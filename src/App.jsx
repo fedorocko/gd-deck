@@ -114,10 +114,11 @@ export default function App() {
 
   return (
     <div
-      className="deck"
-      // A click anywhere but the controls advances, like a clicker would.
+      className={presenting ? 'deck deck--presenting' : 'deck'}
+      // While presenting, a click anywhere but the controls advances, like a
+      // clicker would. Outside it, clicks are left alone so text can be selected.
       onClick={(e) => {
-        if (!e.target.closest('button')) go(1)
+        if (presenting && !e.target.closest('button')) go(1)
       }}
     >
       <div
