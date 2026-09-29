@@ -48,3 +48,6 @@ export default function S01Internal() {
     </SectionLayout>
   )
 }
+
+// Skipped in "Enter Full screen without internal notes" mode.
+S01Internal.internal = true

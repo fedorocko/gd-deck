@@ -2,7 +2,7 @@ import CardsLayout from '../layouts/CardsLayout.jsx'
 import Mark from '../components/Mark.jsx'
 
 // The four promises made over the course of the architecture run, collected in
-// the words they were made in: slides 15, 16, 24 and 25.
+// the words they were made in: slides 16, 17, 25 and 26.
 export default function S32Why() {
   return (
     <CardsLayout

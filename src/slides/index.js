@@ -24,6 +24,7 @@ import S29Context from './S29Context.jsx'
 import S30Management from './S30Management.jsx'
 import S31GovernanceTools from './S31GovernanceTools.jsx'
 import S32Why from './S32Why.jsx'
+import S33Taxonomy from './S33Taxonomy.jsx'
 
 /** Presentation order. Reorder here to reorder the deck. */
 const slides = [
@@ -41,6 +42,7 @@ const slides = [
   S12Mastercard,
   S13Boozt,
   S14Launch,
+  S33Taxonomy,
   S21Box,
   S28BuiltIn,
   S30Management,

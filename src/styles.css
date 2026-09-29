@@ -58,6 +58,15 @@ li {
   inset: 0;
   overflow: hidden;
   background: #000;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Slide content is inert: no hover states, links or text cursor. Clicks fall
+   through to the deck, which advances the slide. */
+.stage * {
+  pointer-events: none;
 }
 
 /* Every slide is authored against a fixed 1600x900 space and scaled. */
@@ -686,6 +695,145 @@ li {
   min-width: 22px;
 }
 
+/* A section slide with a figure beside it: text on the left, figure right. */
+.slide--aside {
+  flex-direction: row;
+  align-items: center;
+  gap: 48px;
+}
+
+.slide--aside .sectionblock {
+  flex: 0 0 500px;
+  gap: 32px;
+}
+
+.slide--aside .h1 {
+  font-size: 60px;
+}
+
+.slide--aside .arc {
+  font-size: 22px;
+  gap: 16px;
+}
+
+.sectionaside {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ------------------------------------------------------------- taxonomy  */
+/* An indented tree. Each item draws its own piece of the trunk (::before) and
+   its own tick into it (::after); the last item stops the trunk at its tick. */
+.tax,
+.tax__kids {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tax__kids {
+  margin-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 8px;
+}
+
+.tax__item--t1 + .tax__item--t1 {
+  margin-top: 8px;
+}
+
+.tax__kids > .tax__item {
+  position: relative;
+  padding-left: 30px;
+  --mid: 17px;
+}
+
+.tax__kids > .tax__item--t1 {
+  --mid: 21px;
+}
+
+.tax__kids > .tax__item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -8px;
+  bottom: 0;
+  border-left: 1.5px solid var(--faint);
+}
+
+.tax__kids > .tax__item:last-child::before {
+  bottom: auto;
+  height: calc(var(--mid) + 8px);
+}
+
+.tax__kids > .tax__item::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: var(--mid);
+  width: 22px;
+  border-top: 1.5px solid var(--faint);
+}
+
+.tax__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.tax__node {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.tax__node--t0 {
+  height: 48px;
+  padding: 0 22px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--ink);
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.tax__node--t1 {
+  height: 42px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1.5px solid var(--paper);
+  font-size: 21px;
+  font-weight: 600;
+}
+
+.tax__node--t2 {
+  height: 34px;
+  width: 188px;
+  font-size: 18px;
+}
+
+.tax__leaves {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tax__leaf {
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 15px;
+  white-space: nowrap;
+}
+
 .arc strong {
   color: var(--accent);
   font-weight: 600;
@@ -1120,4 +1268,69 @@ li {
     animation: none;
     transition: none;
   }
+}
+
+/* ------------------------------------------------------- presenting ui  */
+.present {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  padding: 14px 26px;
+  border-radius: 999px;
+  border: none;
+  background: var(--accent-2);
+  color: var(--ink);
+  font: 600 16px/1 var(--font);
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  box-shadow: 0 8px 28px rgba(124, 199, 255, 0.35);
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+  z-index: 10;
+}
+
+.present:hover {
+  background: #9dd5ff;
+  box-shadow: 0 10px 36px rgba(124, 199, 255, 0.5);
+  transform: translateX(-50%) scale(1.04);
+}
+
+.close {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: rgba(20, 24, 23, 0.55);
+  color: var(--paper);
+  backdrop-filter: blur(8px);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity 160ms ease, border-color 160ms ease;
+  z-index: 10;
+}
+
+.close:hover {
+  opacity: 1;
+  border-color: rgba(244, 243, 239, 0.35);
+}
+
+.present:focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: 3px;
+}
+
+.close:focus-visible {
+  opacity: 1;
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.close svg {
+  width: 18px;
+  height: 18px;
 }
