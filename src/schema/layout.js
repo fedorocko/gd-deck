@@ -58,7 +58,7 @@ function placeNode(node, state, x, y, w, out) {
   let top = y
 
   if (node.art !== undefined) {
-    const h = Math.round(w * ART_RATIO)
+    const h = Math.round(w * (node.artRatio ?? ART_RATIO))
     out.nodes.set(artId(node.id), {
       id: artId(node.id),
       label: '',
@@ -227,6 +227,29 @@ function placeSections(ownerId, sections, state, y, out) {
       cy = titleY + LABEL_H + LABEL_GAP
     }
 
+    if (sec.art) {
+      const pw = (a.w - COL_GAP * (sec.art.length - 1)) / sec.art.length
+      let artBottom = cy
+      sec.art.forEach((p, i) => {
+        const h = Math.round(pw * (p.artRatio ?? ART_RATIO))
+        out.nodes.set(p.id, {
+          id: p.id,
+          label: '',
+          x: a.x + i * (pw + COL_GAP),
+          y: cy,
+          w: pw,
+          h,
+          font: TIERS[sec.items[0].tier].font,
+          radius: 14,
+          art: p.art,
+          hl: false,
+          visible: true,
+        })
+        artBottom = Math.max(artBottom, cy + h)
+      })
+      cy = artBottom + ART_GAP
+    }
+
     const cw = (a.w - COL_GAP * (sec.items.length - 1)) / sec.items.length
     let bottom = cy
     sec.items.forEach((child, i) => {
@@ -348,7 +371,7 @@ function parkHidden(node, out, anchor) {
       out.nodes.set(artId(node.id), {
         id: artId(node.id),
         label: '',
-        h: Math.round(base.w * ART_RATIO),
+        h: Math.round(base.w * (node.artRatio ?? ART_RATIO)),
         font: t.font,
         radius: 14,
         art: node.art,
@@ -366,6 +389,27 @@ function parkHidden(node, out, anchor) {
       ...parked,
     })
   }
+
+  // a section's own pictures fold away into the same place as its items
+  node.kids?.sections?.forEach((sec) =>
+    sec.art?.forEach((p) => {
+      if (out.nodes.has(p.id)) return
+      const base = next ?? { x: 0, y: 0, w: COL_W, h: 0 }
+      out.nodes.set(p.id, {
+        id: p.id,
+        label: '',
+        x: base.x,
+        y: base.y + base.h - 10,
+        w: base.w,
+        h: Math.round(base.w * (p.artRatio ?? ART_RATIO)),
+        font: TIERS[sec.items[0].tier].font,
+        radius: 14,
+        art: p.art,
+        hl: false,
+        visible: false,
+      })
+    }),
+  )
 
   childrenOf(node).forEach((c) => parkHidden(c, out, next))
 }

@@ -36,8 +36,20 @@ const BADGE = { h: 46, font: 17, radius: 10, badge: true }
  * rectangles. `art` is the image it shows; null holds the space as a
  * placeholder until the art is supplied.
  */
-const card = (id, label, tier, art = null) =>
-  box(id, label, tier, { ...BADGE, art })
+const card = (id, label, tier, art = null, extra) =>
+  box(id, label, tier, { ...BADGE, art, ...extra })
+
+/**
+ * Pictures two to a row run wide, so they are cut shorter than a card's usual
+ * 0.62 to keep the Interfaces branch inside the viewport.
+ */
+const WIDE = { artRatio: 0.5 }
+
+/**
+ * A picture that belongs to a whole section rather than to one box in it: a
+ * section's `art` row sits above its items, as many across as it lists.
+ */
+const pic = (id, art = null) => ({ id, art, ...WIDE })
 
 // ------------------------------------------------------------------ the tree
 // `kids` describes how a box's children are arranged once it is unfolded:
@@ -61,15 +73,24 @@ export const TREE = {
           sections: [
             {
               label: 'Built-in',
+              // two pictures over the three apps: the apps are named in the
+              // strip below rather than each carrying a picture of its own
+              art: [
+                pic('builtinArtA', '/media/ss-ai.png'),
+                pic('builtinArtB', '/media/ss-publisher.png'),
+              ],
               items: [
-                card('copilot', 'Dashboard Copilot', 2),
-                card('analyst', 'AI Analyst', 2),
-                card('publisher', 'AI Publisher', 2),
+                box('copilot', 'Dashboard Copilot', 2, BADGE),
+                box('analyst', 'AI Analyst', 2, BADGE),
+                box('publisher', 'AI Publisher', 2, BADGE),
               ],
             },
             {
               label: 'Building blocks',
-              items: [box('sdk', 'SDK', 2, BADGE), box('mcp', 'MCP', 2, BADGE)],
+              items: [
+                card('sdk', 'SDK', 2, '/media/ss-sdk.png', WIDE),
+                card('mcp', 'MCP', 2, '/media/ss-mcp.png', WIDE),
+              ],
             },
           ],
         },

@@ -1247,6 +1247,8 @@ li {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* the pictures are app screenshots: when the frame crops, keep the header */
+  object-position: top;
 }
 
 /* Art still to come, in the same hatch the slide placeholders use. */
