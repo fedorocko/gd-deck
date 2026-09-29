@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import asset from '../asset.js'
-import { ICONS } from '../schema/model.js'
+import { ICONS, STATES } from '../schema/model.js'
 import {
   MODELS,
   ORDER,
+  spotKey,
   uncovered,
   VIEW_H,
   VIEW_W,
@@ -15,7 +16,7 @@ import {
 } from '../schema/layout.js'
 
 /**
- * The diagram behind slides 15–26.
+ * The diagram behind slides 16–26.
  *
  * It is mounted once, outside the keyed slide, so it survives every slide
  * change inside that run and animates from one state to the next instead of
@@ -36,8 +37,39 @@ import {
 /** Long enough for the boxes to have moved before anything new appears. */
 const ENTER_DELAY = '280ms'
 
+/** Spotlight pacing: a beat to take the slide in, then each picture's turn —
+    roughly two seconds held once the 520ms grow has run. */
+const SPOT_LEAD = 1400
+const SPOT_TURN = 2600
+
+/**
+ * Which of a state's spotlit pictures is up, or null. It cycles only while
+ * that state is showing and starts over from the first on every return; the
+ * turn is stamped with its state so a stale one never leaks into a visit.
+ */
+function useSpotlight(state) {
+  const ids = STATES[state]?.spotlight
+  const [turn, setTurn] = useState({ state: null, n: 0 })
+
+  useEffect(() => {
+    if (!ids) return undefined
+    let n = 0
+    let timer = setTimeout(function next() {
+      setTurn({ state, n: n++ })
+      timer = setTimeout(next, SPOT_TURN)
+    }, SPOT_LEAD)
+    return () => clearTimeout(timer)
+  }, [state, ids])
+
+  if (!ids || turn.state !== state) return null
+  return ids[turn.n % ids.length]
+}
+
 export default function Schema({ state }) {
-  const model = MODELS[state]
+  // While a picture has its turn, the state is drawn from the layout with
+  // that picture grown in its row; the boxes around it move to make room.
+  const spot = useSpotlight(state)
+  const model = MODELS[spot ? spotKey(state, spot) : state]
 
   // Which state we are coming from, so the newly uncovered boxes can be told
   // apart from the ones already on screen. Adjusting it while rendering is the
@@ -106,8 +138,15 @@ export default function Schema({ state }) {
               <path
                 key={id}
                 d={a.d}
+                className={
+                  a.visible && a.flow !== undefined ? 'sx-arrows__flow' : undefined
+                }
                 markerEnd={a.head ? 'url(#sx-head)' : undefined}
-                style={{ opacity: a.visible ? 1 : 0, '--d': delay(id) }}
+                style={{
+                  opacity: a.visible ? 1 : 0,
+                  '--d': delay(id),
+                  '--i': a.flow,
+                }}
               />
             )
           })}
@@ -119,6 +158,7 @@ export default function Schema({ state }) {
             'sx-label',
             l.kind === 'arrow' && 'sx-label--arrow',
             l.kind === 'logos' && 'sx-label--logos',
+            l.kind === 'section' && 'sx-label--section',
             l.hl && 'sx-label--hl',
           ]
             .filter(Boolean)
@@ -139,7 +179,9 @@ export default function Schema({ state }) {
                 ? l.logos.map((src) => (
                     <img key={src} src={asset(src)} alt="" />
                   ))
-                : l.text}
+                : l.kind === 'section'
+                  ? <span className="sx-label__pill">{l.text}</span>
+                  : l.text}
             </div>
           )
         })}
@@ -153,10 +195,13 @@ export default function Schema({ state }) {
           const cls = [
             'sx',
             n.hl && 'sx--hl',
+            n.ctx && 'sx--ctx',
+            n.flow !== undefined && 'sx--flow',
             n.badge && 'sx--badge',
             icon && 'sx--icon',
             pic && 'sx--pic',
             pic && !n.art && 'sx--empty',
+            n.spot && 'sx--spot',
           ]
             .filter(Boolean)
             .join(' ')
@@ -173,6 +218,7 @@ export default function Schema({ state }) {
                 borderRadius: n.radius,
                 opacity: n.visible ? 1 : 0,
                 '--d': delay(id),
+                '--i': n.flow,
               }}
             >
               {n.art && <img className="sx__pic" src={asset(n.art)} alt="" />}

@@ -12,7 +12,7 @@ export default function S28BuiltIn() {
       ]}
       note={
         <>
-          We help you build{' '}
+          They let you build{' '}
           <Mark keep>new use-cases</Mark> and become an{' '}
           <Mark keep>AI leader.</Mark>
         </>

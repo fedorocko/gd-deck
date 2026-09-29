@@ -24,7 +24,7 @@ export default function S32Why() {
           id: 'lead',
           text: (
             <>
-              We help you build{' '}
+              They let you build{' '}
               <Mark keep>new use-cases</Mark> and become an{' '}
               <Mark keep>AI leader.</Mark>
             </>

@@ -8,8 +8,7 @@
  * transition of one diagram rather than a cut between two.
  *
  * Tiers carry the taxonomy. A tier-1 box (Interfaces, Management Tools,
- * Infrastructure) is taller and set larger than a tier-2 box (Definitions &
- * Context), which in turn outranks tier 3 (Semantics, Metrics). Because every
+ * Infrastructure) is taller and set larger than a tier-2 box (Context), which in turn outranks tier 3 (Semantics, Metrics). Because every
  * tier has a fixed inset from the column edge, boxes of the same rank always
  * share their left and right border, whichever branch they hang off.
  */
@@ -102,7 +101,7 @@ export const TREE = {
           layout: 'stack',
           items: [
             {
-              ...box('defs', 'Definitions & Context', 2),
+              ...box('defs', 'Context', 2),
               kids: {
                 layout: 'columns',
                 columns: [
@@ -131,18 +130,18 @@ export const TREE = {
               },
             },
             {
-              ...box('gov', 'Governance & Control', 2),
+              ...box('gov', 'Governance', 2),
               kids: {
                 layout: 'columns',
                 columns: [
-                  { label: 'Data', items: [card('catalog', 'Catalog', 3)] },
-                  { label: 'Business', items: [card('aihub', 'AI Hub', 3)] },
-                  { label: 'Agents', items: [card('builder', 'Builder', 3)] },
+                  { label: 'Data', items: [card('catalog', 'Catalog', 3, '/media/catalog.png')] },
+                  { label: 'Business', items: [card('aihub', 'AI Hub', 3, '/media/hub.png')] },
+                  { label: 'Agents', items: [card('builder', 'Builder', 3, '/media/builder.png')] },
                 ],
               },
             },
             {
-              ...box('life', 'Lifecycle Management', 2),
+              ...box('life', 'Lifecycle', 2),
               kids: {
                 layout: 'row',
                 // wider than the usual column gap: the arrows that run between
@@ -257,7 +256,9 @@ export const CLONES = [
 
 // ---------------------------------------------------------------- the states
 // expand — boxes whose children are showing (an ancestor must be expanded too)
-// hl     — boxes drawn as the highlight; everything else recedes
+// hl     — what the slide is about: drawn as the full highlight
+// parent — the box those hang from, kept in view as their context: drawn as
+//          an outline, a step below the highlight. Everything else recedes.
 // focus  — what the viewport centres on: `sub` takes a box with everything
 //          unfolded beneath it, `box` takes the box alone
 // widths — narrows named boxes to leave room for the arrows beside them
@@ -275,20 +276,26 @@ export const STATES = {
 
   builtin: {
     expand: ['interfaces'],
-    hl: ['interfaces', 'copilot', 'analyst', 'publisher', 'sdk', 'mcp'],
+    hl: ['copilot', 'analyst', 'publisher', 'sdk', 'mcp'],
+    parent: ['interfaces'],
+    // the screenshots are too small to read in place, so while the slide is
+    // up each one takes a turn growing across its row, its neighbour giving
+    // way. `sdk` and `mcp` are cards, so it is their picture that grows.
+    spotlight: ['builtinArtA', 'builtinArtB', 'sdk', 'mcp'],
     focus: { sub: ['interfaces'] },
   },
 
   management: {
     expand: ['mgmt'],
-    hl: ['mgmt', 'defs', 'gov', 'life'],
+    hl: ['defs', 'gov', 'life'],
+    parent: ['mgmt'],
     focus: { sub: ['mgmt'] },
   },
 
   context: {
     expand: ['mgmt', 'defs'],
+    parent: ['defs'],
     hl: [
-      'defs',
       'semantics',
       'metrics',
       'knowledge',
@@ -301,13 +308,16 @@ export const STATES = {
 
   governance: {
     expand: ['mgmt', 'gov'],
-    hl: ['gov', 'catalog', 'aihub', 'builder'],
+    hl: ['catalog', 'aihub', 'builder'],
+    parent: ['gov'],
+    spotlight: ['catalog', 'aihub', 'builder'],
     focus: { sub: ['mgmt'] },
   },
 
   lifecycle: {
     expand: ['mgmt', 'life'],
-    hl: ['life', 'evaluations', 'observability', 'selflearning'],
+    hl: ['evaluations', 'observability', 'selflearning'],
+    parent: ['life'],
     arrows: 'flow',
     flow: ['evaluations', 'observability', 'selflearning'],
     focus: { sub: ['mgmt'], box: ['infra'] },
@@ -324,8 +334,8 @@ export const STATES = {
 
   infra: {
     expand: ['infra', 'compute', 'storage'],
+    parent: ['infra'],
     hl: [
-      'infra',
       'inference',
       'compute',
       'mpp',
@@ -342,6 +352,7 @@ export const STATES = {
   open: {
     expand: ['infra'],
     hl: ['inference', 'compute', 'storage'],
+    parent: ['infra'],
     widths: { inference: 336, compute: 336, storage: 336 },
     arrows: 'open',
     focus: { sub: ['infra'] },
@@ -361,6 +372,7 @@ export const STATES = {
     expand: ['infra', 'compute'],
     hide: ['aisearch', 'realtime'],
     hl: ['compute', 'mpp', 'inmemory', 'storage'],
+    parent: ['infra'],
     tails: { compute: 44 },
     arrows: 'merge',
     focus: { sub: ['infra'] },
@@ -368,7 +380,8 @@ export const STATES = {
 
   inference: {
     expand: ['infra', 'inference'],
-    hl: ['inference', 'router', 'modelA', 'profileA', 'modelB', 'profileB'],
+    hl: ['router', 'modelA', 'profileA', 'modelB', 'profileB'],
+    parent: ['inference'],
     arrows: 'branch',
     focus: { sub: ['inference'], box: ['infra'] },
   },

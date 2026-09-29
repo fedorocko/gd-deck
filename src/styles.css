@@ -1251,6 +1251,11 @@ li {
   object-position: top;
 }
 
+/* A picture taking its turn grown across its row. */
+.sx--spot {
+  border-color: var(--accent-line);
+}
+
 /* Art still to come, in the same hatch the slide placeholders use. */
 .sx--empty {
   background: repeating-linear-gradient(
@@ -1262,12 +1267,28 @@ li {
   );
 }
 
-/* What this slide is about. */
+/* Two levels of highlight, used the same way on every diagram slide:
+   1. the focus — what the slide is about: a lime fill, a solid lime edge and
+      a glow, so it is the brightest thing in the column;
+   2. the parent — the box the focus hangs from, kept in view so the viewer
+      knows where they are: set in full white inside a thin lime outline, with
+      no fill, a clear step below the focus and above everything else. */
 .sx--hl {
   color: var(--paper);
-  background: var(--accent-wash);
-  border-color: var(--accent-line);
-  box-shadow: 0 14px 36px -28px rgba(198, 242, 78, 0.5);
+  background: rgba(218, 254, 133, 0.18);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), 0 16px 40px -20px rgba(218, 254, 133, 0.45);
+}
+
+.sx--ctx {
+  color: var(--paper);
+  background: rgba(218, 254, 133, 0.04);
+  border-color: rgba(218, 254, 133, 0.6);
+  box-shadow: inset 0 0 0 1px rgba(218, 254, 133, 0.25);
+}
+
+.sx--ctx .sx__icon {
+  opacity: 1;
 }
 
 /* ------------------------------------------------- column and arrow labels */
@@ -1289,6 +1310,30 @@ li {
 
 .sx-label--hl {
   color: var(--accent);
+}
+
+/* A section title names a group of siblings, so it is set as a pill: lime
+   while its layer is the subject, an outline otherwise. */
+.sx-label--section {
+  height: 28px;
+}
+
+.sx-label__pill {
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  box-shadow: inset 0 0 0 1px var(--line);
+  transition: background-color 420ms ease, color 420ms ease,
+    box-shadow 420ms ease;
+}
+
+.sx-label--hl .sx-label__pill {
+  background: var(--accent);
+  color: var(--ink);
+  box-shadow: none;
 }
 
 /* Set beside an arrow, so it reads from the box it points away from. */
@@ -1350,7 +1395,78 @@ li {
   stroke: none;
 }
 
+/* A flow in motion: a band of light sweeps through each box in turn, and the
+   arrow after it flashes as the light hands over to the next, so the eye
+   follows the sequence round and round. Every piece shares one period and is
+   offset by its step (--i), which keeps them in lockstep without a script. */
+.sx--flow {
+  overflow: hidden;
+}
+
+.sx--flow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 55%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(218, 254, 133, 0.32),
+    transparent
+  );
+  transform: translateX(-120%);
+  /* under the label: the box's transform makes it a stacking context, so -1
+     still paints above the box's own fill */
+  z-index: -1;
+  pointer-events: none;
+  animation: sx-sweep var(--flow-period) linear infinite;
+  animation-delay: calc(var(--i) * var(--flow-step) + 700ms);
+}
+
+.sx-arrows path.sx-arrows__flow {
+  animation: sx-handover var(--flow-period) ease-out infinite;
+  animation-delay: calc(var(--i) * var(--flow-step) + 700ms + 560ms);
+}
+
+.schema {
+  --flow-period: 2700ms;
+  --flow-step: 900ms;
+}
+
+@keyframes sx-sweep {
+  0% {
+    transform: translateX(-120%);
+  }
+  26% {
+    transform: translateX(220%);
+  }
+  100% {
+    transform: translateX(220%);
+  }
+}
+
+@keyframes sx-handover {
+  0%,
+  100% {
+    stroke-opacity: 0.8;
+    stroke-width: 1.6;
+  }
+  8% {
+    stroke-opacity: 1;
+    stroke-width: 3;
+  }
+  22% {
+    stroke-opacity: 0.8;
+    stroke-width: 1.6;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .sx--flow::before {
+    animation: none;
+    display: none;
+  }
+
   .schema,
   .schema__world,
   .sx,

@@ -18,11 +18,18 @@ import { CLONES, COL_W, STATE_ORDER, STATES, TIERS, TREE } from './model.js'
 const SIB_GAP = { 1: 18, 2: 12, 3: 12 }
 const PARENT_GAP = 12
 const COL_GAP = 14
-const LABEL_H = 22
+/** Section and column titles are set as pills: the height they stand. */
+const PILL_H = 28
 const LABEL_GAP = 8
 /** Extra air above a column title, so it reads as a title and not as a caption
     stuck to the underside of the box it hangs from. */
 const LABEL_LEAD = 10
+/** The share of its row a spotlit picture takes, by how many share the row;
+    its neighbours split the rest. Heights follow the widths, so the picture
+    grows in both directions. A row of three gives less away, so the two
+    that shrink stay wide enough to keep their labels. */
+const SPOT_SHARE = { 2: 0.7, 3: 0.6 }
+
 /** Air between two titled bands. The title carries its own lead above it, so
     this only has to part the bands, not re-state the gap. */
 const SECTION_GAP = 8
@@ -34,9 +41,9 @@ const ART_GAP = 10
 
 /** The slot the diagram occupies on the 1600x900 stage. */
 export const VIEW_X = 848
-export const VIEW_Y = 120
+export const VIEW_Y = 40
 export const VIEW_W = 632
-export const VIEW_H = 660
+export const VIEW_H = 820
 export const WORLD_W = COL_W
 export const WORLD_H = 900
 /** Centres the 600-wide column in the 632-wide slot. */
@@ -50,15 +57,27 @@ const area = (tier) => ({
 
 // ------------------------------------------------------------------- walking
 
+const flowStep = (state, id) => {
+  const i = state.flow.indexOf(id)
+  return i === -1 ? undefined : i
+}
+
+/** Titles over a box's children light up whenever that box is lit at all —
+ *  as the subject or as the parent kept in view for it. */
+const lit = (state, id) =>
+  state.hl.includes(id) || !!state.parent?.includes(id)
+
 /** A card's picture shares the badge's id, so the two travel together. */
 const artId = (id) => `${id}:art`
 
-function placeNode(node, state, x, y, w, out) {
+/** artPad drops a card's picture so pictures of unequal height in one row
+ *  share a bottom edge, and the badges under them stay on one line. */
+function placeNode(node, state, x, y, w, out, artPad = 0) {
   const t = TIERS[node.tier]
-  let top = y
+  let top = y + artPad
 
   if (node.art !== undefined) {
-    const h = Math.round(w * (node.artRatio ?? ART_RATIO))
+    const h = artHeight(node, w)
     out.nodes.set(artId(node.id), {
       id: artId(node.id),
       label: '',
@@ -70,6 +89,7 @@ function placeNode(node, state, x, y, w, out) {
       radius: 14,
       art: node.art,
       hl: false,
+      spot: node.id === state.spot,
       visible: true,
     })
     top += h + ART_GAP
@@ -87,6 +107,9 @@ function placeNode(node, state, x, y, w, out) {
     radius: node.radius ?? t.radius,
     badge: node.badge,
     hl: state.hl.includes(node.id),
+    ctx: !!state.parent?.includes(node.id),
+    // position along a drawn flow, so the renderer can stagger its pulse
+    flow: state.arrows === 'flow' ? flowStep(state, node.id) : undefined,
     visible: true,
   })
 
@@ -166,23 +189,36 @@ function placeKids(node, state, y, out) {
 
 function placeColumns(ownerId, columns, state, y, out) {
   const a = area(columns[0].items[0].tier)
-  const cw = (a.w - COL_GAP * (columns.length - 1)) / columns.length
+  // a column widens when the card heading it is spotlit
+  const ws = rowWidths(
+    columns.map((col) => ({ id: col.items[0].id })),
+    a.w,
+    state.spot,
+  )
+  // cards heading the columns share a bottom edge, like a section's row
+  const heads = columns.map((col, i) =>
+    col.items[0].art !== undefined ? artHeight(col.items[0], ws[i]) : 0,
+  )
+  const headArt = Math.max(...heads)
   const titled = columns.some((c) => c.label)
   const titleY = y + LABEL_LEAD
-  const top = titled ? titleY + LABEL_H + LABEL_GAP : y
+  // column titles are set as pills, like the section titles
+  const top = titled ? titleY + PILL_H + LABEL_GAP : y
   let bottom = top
+  let cx = a.x
 
   columns.forEach((col, ci) => {
-    const cx = a.x + ci * (cw + COL_GAP)
+    const cw = ws[ci]
 
     if (col.label) {
       out.labels.set(`${ownerId}:${ci}`, {
         id: `${ownerId}:${ci}`,
+        kind: 'section',
         text: col.label,
         x: cx,
         y: titleY,
         w: cw,
-        hl: state.hl.includes(ownerId),
+        hl: lit(state, ownerId),
         visible: true,
       })
     }
@@ -190,12 +226,30 @@ function placeColumns(ownerId, columns, state, y, out) {
     let cy = top
     col.items.forEach((child, i) => {
       if (i) cy += SIB_GAP[child.tier]
-      cy = placeNode(child, state, cx, cy, cw, out)
+      const pad = i === 0 && heads[ci] ? headArt - heads[ci] : 0
+      cy = placeNode(child, state, cx, cy, cw, out, pad)
     })
     bottom = Math.max(bottom, cy)
+    cx += cw + COL_GAP
   })
 
   return bottom
+}
+
+const artHeight = (node, w) =>
+  Math.round(w * (node.artRatio ?? ART_RATIO))
+
+/**
+ * Widths for a row of items: equal, unless one of them is spotlit, in which
+ * case it takes SPOT_SHARE of the row and the rest split what is left.
+ */
+function rowWidths(items, total, spot) {
+  const free = total - COL_GAP * (items.length - 1)
+  const at = items.findIndex((it) => it.id === spot)
+  if (at === -1 || items.length < 2) return items.map(() => free / items.length)
+  const big = free * (SPOT_SHARE[items.length] ?? SPOT_SHARE[2])
+  const small = (free - big) / (items.length - 1)
+  return items.map((_, i) => (i === at ? big : small))
 }
 
 /**
@@ -206,7 +260,7 @@ function placeColumns(ownerId, columns, state, y, out) {
  * heading over the first of them.
  */
 function placeSections(ownerId, sections, state, y, out) {
-  const hl = state.hl.includes(ownerId)
+  const hl = lit(state, ownerId)
   let cy = y
 
   sections.forEach((sec, si) => {
@@ -217,6 +271,7 @@ function placeSections(ownerId, sections, state, y, out) {
       const titleY = cy + LABEL_LEAD
       out.labels.set(`${ownerId}:s${si}`, {
         id: `${ownerId}:s${si}`,
+        kind: 'section',
         text: sec.label,
         x: a.x,
         y: titleY,
@@ -224,37 +279,48 @@ function placeSections(ownerId, sections, state, y, out) {
         hl,
         visible: true,
       })
-      cy = titleY + LABEL_H + LABEL_GAP
+      cy = titleY + PILL_H + LABEL_GAP
     }
 
     if (sec.art) {
-      const pw = (a.w - COL_GAP * (sec.art.length - 1)) / sec.art.length
-      let artBottom = cy
+      const ws = rowWidths(sec.art, a.w, state.spot)
+      const hs = sec.art.map((p, i) => artHeight(p, ws[i]))
+      const rowH = Math.max(...hs)
+      let px = a.x
       sec.art.forEach((p, i) => {
-        const h = Math.round(pw * (p.artRatio ?? ART_RATIO))
         out.nodes.set(p.id, {
           id: p.id,
           label: '',
-          x: a.x + i * (pw + COL_GAP),
-          y: cy,
-          w: pw,
-          h,
+          x: px,
+          y: cy + rowH - hs[i],
+          w: ws[i],
+          h: hs[i],
           font: TIERS[sec.items[0].tier].font,
           radius: 14,
           art: p.art,
           hl: false,
+          spot: p.id === state.spot,
           visible: true,
         })
-        artBottom = Math.max(artBottom, cy + h)
+        px += ws[i] + COL_GAP
       })
-      cy = artBottom + ART_GAP
+      cy += rowH + ART_GAP
     }
 
-    const cw = (a.w - COL_GAP * (sec.items.length - 1)) / sec.items.length
+    const ws = rowWidths(sec.items, a.w, state.spot)
+    const hs = sec.items.map((c, i) =>
+      c.art !== undefined ? artHeight(c, ws[i]) : 0,
+    )
+    const rowArt = Math.max(...hs)
     let bottom = cy
+    let cx = a.x
     sec.items.forEach((child, i) => {
-      const cx = a.x + i * (cw + COL_GAP)
-      bottom = Math.max(bottom, placeNode(child, state, cx, cy, cw, out))
+      const pad = child.art !== undefined ? rowArt - hs[i] : 0
+      bottom = Math.max(
+        bottom,
+        placeNode(child, state, cx, cy, ws[i], out, pad),
+      )
+      cx += ws[i] + COL_GAP
     })
     cy = bottom
   })
@@ -539,7 +605,12 @@ function addArrows(state, out) {
       const b = out.nodes.get(state.flow[i + 1])
       if (!b) return
       const y = a.y + a.h / 2
-      arrow(out, `arrow:flow${i}`, `M ${a.x + a.w + FLOW_PAD} ${y} H ${b.x - FLOW_PAD}`)
+      arrow(
+        out,
+        `arrow:flow${i}`,
+        `M ${a.x + a.w + FLOW_PAD} ${y} H ${b.x - FLOW_PAD}`,
+        { flow: i },
+      )
     })
     return
   }
@@ -656,8 +727,8 @@ function viewOffset(state, out) {
 
 // --------------------------------------------------------------------- build
 
-function buildLayout(key) {
-  const state = STATES[key]
+function buildLayout(key, spot) {
+  const state = spot ? { ...STATES[key], spot } : STATES[key]
   const out = {
     nodes: new Map(),
     labels: new Map(),
@@ -700,6 +771,25 @@ for (const kind of ['labels', 'frames', 'arrows']) {
         here.set(id, { ...(last.get(id) ?? seed), visible: false })
       }
     }
+  }
+}
+
+/**
+ * A state with a spotlight gets one extra layout per picture, keyed
+ * `state@id`, with that picture grown in its row. They are the same state as
+ * far as labels, frames and arrows go, so those are copied across.
+ */
+export const spotKey = (key, id) => `${key}@${id}`
+
+for (const key of STATE_ORDER) {
+  for (const id of STATES[key].spotlight ?? []) {
+    const m = buildLayout(key, id)
+    for (const kind of ['labels', 'frames', 'arrows']) {
+      for (const [lid, d] of MODELS[key][kind]) {
+        if (!m[kind].has(lid)) m[kind].set(lid, d)
+      }
+    }
+    MODELS[spotKey(key, id)] = m
   }
 }
 
