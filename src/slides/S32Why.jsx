@@ -24,7 +24,7 @@ export default function S32Why() {
           id: 'lead',
           text: (
             <>
-              They let you build{' '}
+              It lets you build{' '}
               <Mark keep>new use-cases</Mark> and become an{' '}
               <Mark keep>AI leader.</Mark>
             </>
@@ -34,7 +34,7 @@ export default function S32Why() {
           id: 'compute',
           text: (
             <>
-              We help you run your compute workflow for{' '}
+              It lets you run your compute workflow for{' '}
               <Mark keep>less.</Mark>
             </>
           ),
@@ -43,7 +43,7 @@ export default function S32Why() {
           id: 'tokens',
           text: (
             <>
-              We give you{' '}
+              It gives you{' '}
               <Mark keep>predictable spend</Mark> on your AI
               tokens.
             </>

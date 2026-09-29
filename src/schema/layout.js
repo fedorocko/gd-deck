@@ -72,9 +72,39 @@ const artId = (id) => `${id}:art`
 
 /** artPad drops a card's picture so pictures of unequal height in one row
  *  share a bottom edge, and the badges under them stay on one line. */
+/**
+ * Rows of equal items, one under another. A row may be inset from both sides
+ * of its tier's band, to leave room for arrows leading out beside it.
+ */
+function placeRows(rows, state, y, out) {
+  let cy = y
+  rows.forEach((row, ri) => {
+    const items = shown(row.items, state)
+    if (!items.length) return
+    if (ri) cy += SIB_GAP[items[0].tier]
+    const a = area(items[0].tier)
+    const inset = row.inset ?? 0
+    const w = a.w - inset * 2
+    const cw = (w - COL_GAP * (items.length - 1)) / items.length
+    let bottom = cy
+    items.forEach((child, i) => {
+      const cx = a.x + inset + i * (cw + COL_GAP)
+      bottom = Math.max(bottom, placeNode(child, state, cx, cy, cw, out))
+    })
+    cy = bottom
+  })
+  return cy
+}
+
 function placeNode(node, state, x, y, w, out, artPad = 0) {
   const t = TIERS[node.tier]
   let top = y + artPad
+
+  // rows that sit over their parent rather than under it, once it is open
+  const above = node.kids?.rows?.filter((r) => r.above) ?? []
+  if (above.length && state.expand.includes(node.id)) {
+    top = placeRows(above, state, top, out) + PARENT_GAP
+  }
 
   if (node.art !== undefined) {
     const h = artHeight(node, w)
@@ -96,18 +126,23 @@ function placeNode(node, state, x, y, w, out, artPad = 0) {
   }
 
   const h = node.h ?? t.h
+  // a pill keeps its own width, centred in the space it is given
+  const pw = node.pillW ? Math.min(node.pillW, w) : w
   out.nodes.set(node.id, {
     id: node.id,
     label: node.label,
-    x,
+    x: x + (w - pw) / 2,
     y: top,
-    w,
+    w: pw,
     h,
     font: node.font ?? t.font,
     radius: node.radius ?? t.radius,
     badge: node.badge,
+    pill: node.pill,
     hl: state.hl.includes(node.id),
-    ctx: !!state.parent?.includes(node.id),
+    // a placeholder for a logo set inside the box, named for what goes there
+    slot: state.slots?.[node.id],
+    ctx: !!(state.parent?.includes(node.id) || state.ctx?.includes(node.id)),
     // position along a drawn flow, so the renderer can stagger its pulse
     flow: state.arrows === 'flow' ? flowStep(state, node.id) : undefined,
     visible: true,
@@ -134,6 +169,8 @@ function placeKids(node, state, y, out) {
     let cy = y
     shown(k.items, state).forEach((child, i) => {
       if (i) cy += SIB_GAP[child.tier]
+      // extra room a state opens above a box, for something drawn in between
+      cy += state.gaps?.[child.id] ?? 0
       const a = area(child.tier)
       cy = placeNode(child, state, a.x, cy, state.widths?.[child.id] ?? a.w, out)
     })
@@ -151,6 +188,11 @@ function placeKids(node, state, y, out) {
       bottom = Math.max(bottom, placeNode(child, state, cx, y, cw, out))
     })
     return bottom + tail
+  }
+
+  if (k.layout === 'rows') {
+    // the rows flagged `above` were already set over the box by placeNode
+    return placeRows(k.rows.filter((r) => !r.above), state, y, out) + tail
   }
 
   if (k.layout === 'columns') {
@@ -468,6 +510,7 @@ function parkHidden(node, out, anchor) {
       font: node.font ?? t.font,
       radius: node.radius ?? t.radius,
       badge: node.badge,
+      pill: node.pill,
       ...parked,
     })
   }
@@ -502,6 +545,7 @@ function childrenOf(node) {
   if (node.kids?.lead) kids.push(node.kids.lead)
   node.kids?.items?.forEach((c) => kids.push(c))
   node.kids?.columns?.forEach((col) => col.items.forEach((c) => kids.push(c)))
+  node.kids?.rows?.forEach((row) => row.items.forEach((c) => kids.push(c)))
   node.kids?.sections?.forEach((sec) => sec.items.forEach((c) => kids.push(c)))
   return kids
 }
@@ -552,23 +596,105 @@ function addFrame(state, out) {
   })
 }
 
-const OPEN_LABELS = {
-  inference: 'Other models',
-  compute: 'Flex connect',
-  storage: 'Other engines',
-}
+/** How far an arrow leading out of a box's side reaches. */
+const SIDE_ARROW = 48
 
-/** How far an arrow in the open state reaches, and the air after it. */
-const OPEN_ARROW = 104
-const LOGO_GAP = 16
+/** Logos and logo placeholders drawn beside the diagram. */
 const LOGO_SIZE = 42
 
-/** Who each layer opens out to, drawn at the far end of its arrow. A layer
- *  with nothing named simply has none. */
-const OPEN_LOGOS = {
-  inference: ['/media/icon-anthropic.png', '/media/icon-openai.png'],
-  compute: ['/media/icon-arrow.png'],
-  storage: ['/media/icon-databricks.png', '/media/icon-snowflake.png'],
+/** The catalog pill on the storage slide, and what reads through it. */
+const CAT_W = 132
+const CAT_H = 38
+const CATALOG_ENGINES = {
+  left: '/media/icon-databricks.png',
+  right: '/media/icon-snowflake.png',
+}
+/** Sources ingested into storage, drawn below it; null holds a placeholder
+    until the logo is supplied. */
+const CATALOG_SOURCES = [
+  '/media/icon-redshift.png',
+  '/media/icon-fabric.png',
+  '/media/icon-bigquery.png',
+  '/media/icon-databricks.png',
+  '/media/icon-snowflake.png',
+]
+/** Drop from Storage's underside to the sources under it. */
+const SOURCE_DROP = 64
+
+/**
+ * The storage slide's one-off drawing: a catalog pill in the gap between
+ * Compute and Storage, fed by our compute from above and by outside engines
+ * from either side, and passing down into Storage; and the sources that feed
+ * Storage, set below it.
+ */
+function addCatalog(out) {
+  const compute = out.nodes.get('compute')
+  const store = out.nodes.get('storage')
+  const cx = COL_W / 2
+  const gapTop = compute.y + compute.h
+  const catY = Math.round((gapTop + store.y - CAT_H) / 2)
+  const catMid = catY + CAT_H / 2
+
+  out.labels.set('catalog', {
+    id: 'catalog',
+    kind: 'pill',
+    text: 'Catalog',
+    x: cx - CAT_W / 2,
+    y: catY,
+    w: CAT_W,
+    h: CAT_H,
+    hl: true,
+    visible: true,
+  })
+  arrow(out, 'arrow:cat-in', `M ${cx} ${gapTop + FLOW_PAD} V ${catY - FLOW_PAD}`)
+  arrow(out, 'arrow:cat-out', `M ${cx} ${catY + CAT_H + FLOW_PAD} V ${store.y - FLOW_PAD}`)
+
+  // outside engines, level with the pill, each pointing in at it
+  const logoY = catMid - LOGO_SIZE / 2
+  const lx = store.x
+  const rx = store.x + store.w - LOGO_SIZE
+  out.labels.set('engine:left', {
+    id: 'engine:left',
+    kind: 'logos',
+    logos: [CATALOG_ENGINES.left],
+    x: lx,
+    y: logoY,
+    w: LOGO_SIZE,
+    h: LOGO_SIZE,
+    hl: false,
+    visible: true,
+  })
+  out.labels.set('engine:right', {
+    id: 'engine:right',
+    kind: 'logos',
+    logos: [CATALOG_ENGINES.right],
+    x: rx,
+    y: logoY,
+    w: LOGO_SIZE,
+    h: LOGO_SIZE,
+    hl: false,
+    visible: true,
+  })
+  arrow(out, 'arrow:eng-left', `M ${lx + LOGO_SIZE + 12} ${catMid} H ${cx - CAT_W / 2 - FLOW_PAD}`)
+  arrow(out, 'arrow:eng-right', `M ${rx - 12} ${catMid} H ${cx + CAT_W / 2 + FLOW_PAD}`)
+
+  // sources, spread under Storage, each feeding up into it
+  const srcY = store.y + store.h + SOURCE_DROP
+  CATALOG_SOURCES.forEach((src, i) => {
+    const sx = store.x + (store.w * (2 * i + 1)) / (2 * CATALOG_SOURCES.length)
+    out.labels.set(`source:${i}`, {
+      id: `source:${i}`,
+      kind: 'logos',
+      logos: [src],
+      x: sx - LOGO_SIZE / 2,
+      y: srcY,
+      w: LOGO_SIZE,
+      h: LOGO_SIZE,
+      hl: false,
+      visible: true,
+    })
+    arrow(out, `arrow:source${i}`, `M ${sx} ${srcY - FLOW_PAD - 2} V ${store.y + store.h + FLOW_PAD}`)
+  })
 }
 
 function addArrows(state, out) {
@@ -582,36 +708,8 @@ function addArrows(state, out) {
     return
   }
 
-  if (state.arrows === 'open') {
-    for (const [id, text] of Object.entries(OPEN_LABELS)) {
-      const r = out.nodes.get(id)
-      const y = r.y + r.h / 2
-      const x0 = r.x + r.w + 18
-      arrow(out, `arrow:${id}`, `M ${x0} ${y} H ${x0 + OPEN_ARROW}`)
-      out.labels.set(`arrow:${id}`, {
-        id: `arrow:${id}`,
-        text,
-        x: x0 - 2,
-        y: y - 36,
-        w: 210,
-        kind: 'arrow',
-        hl: true,
-        visible: true,
-      })
-
-      const logos = OPEN_LOGOS[id]
-      if (!logos) continue
-      out.labels.set(`logos:${id}`, {
-        id: `logos:${id}`,
-        logos,
-        x: x0 + OPEN_ARROW + LOGO_GAP,
-        y: y - LOGO_SIZE / 2,
-        w: logos.length * LOGO_SIZE + (logos.length - 1) * 10,
-        kind: 'logos',
-        hl: false,
-        visible: true,
-      })
-    }
+  if (state.arrows === 'catalog') {
+    addCatalog(out)
     return
   }
 
@@ -638,10 +736,22 @@ function addArrows(state, out) {
     const store = out.nodes.get('storage')
     const tip = store.y - 16
     const mid = COL_W / 2
-    const engines = DESCENDANTS.get('compute')
-      .filter((id) => id !== 'compute')
+    const engines = (
+      state.merge ?? DESCENDANTS.get('compute').filter((id) => id !== 'compute')
+    )
       .map((id) => out.nodes.get(id))
       .filter((r) => r.visible)
+
+    // boxes that lead out of the diagram, each with an arrow off its side
+    for (const [id, side] of Object.entries(state.sideways ?? {})) {
+      const r = out.nodes.get(id)
+      const y = r.y + r.h / 2
+      const d =
+        side === 'left'
+          ? `M ${r.x - FLOW_PAD} ${y} H ${r.x - SIDE_ARROW}`
+          : `M ${r.x + r.w + FLOW_PAD} ${y} H ${r.x + r.w + SIDE_ARROW}`
+      arrow(out, `arrow:side:${id}`, d)
+    }
 
     for (const r of engines) {
       const start = r.y + r.h
@@ -689,9 +799,11 @@ const DESCENDANTS = (() => {
 function contentBounds(out) {
   let top = Infinity
   let bottom = -Infinity
-  for (const set of [out.nodes, out.frames]) {
+  // labels only count once they are given a height: the ones drawn below the
+  // boxes (logos, pills) must stay in view, the titles tucked between do not
+  for (const set of [out.nodes, out.frames, out.labels]) {
     for (const d of set.values()) {
-      if (!d.visible) continue
+      if (!d.visible || d.h === undefined) continue
       top = Math.min(top, d.y)
       bottom = Math.max(bottom, d.y + d.h)
     }

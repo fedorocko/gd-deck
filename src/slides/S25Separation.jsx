@@ -4,14 +4,17 @@ import StatementLayout from '../layouts/StatementLayout.jsx'
 export default function S25Separation() {
   return (
     <StatementLayout
-      statement="While storage and compute separation drives cost and query latency down."
-      note={
+      statement={
         <>
-          We help you run your compute workflow for{' '}
-          <Mark keep>less.</Mark>
+          While different compute engines fit any use case and{' '}
+          <Mark>drive cost and latency down.</Mark>
         </>
       }
-      kpis={[{ value: '30%', label: 'savings on compute' }]}
+      kpis={[
+        { value: '30%', label: 'savings on compute' },
+        // query latency on our engines, not the model benchmark in benchmarks.js
+        { value: '50%', label: 'lower latency' },
+      ]}
     />
   )
 }

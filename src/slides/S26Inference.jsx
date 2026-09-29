@@ -5,7 +5,12 @@ import StatementLayout from '../layouts/StatementLayout.jsx'
 export default function S26Inference() {
   return (
     <StatementLayout
-      statement="The native inference gives you the best accuracy and token economics by:"
+      statement={
+        <>
+          The native inference gives you the best <Mark>accuracy</Mark> and{' '}
+          <Mark>token economics</Mark> by:
+        </>
+      }
       list={[
         'Routing each prompt to the right model',
         'Caching outputs',

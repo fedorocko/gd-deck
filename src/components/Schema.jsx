@@ -159,6 +159,7 @@ export default function Schema({ state }) {
             l.kind === 'arrow' && 'sx-label--arrow',
             l.kind === 'logos' && 'sx-label--logos',
             l.kind === 'section' && 'sx-label--section',
+            l.kind === 'pill' && 'sx-label--pill',
             l.hl && 'sx-label--hl',
           ]
             .filter(Boolean)
@@ -176,10 +177,17 @@ export default function Schema({ state }) {
               }}
             >
               {l.logos
-                ? l.logos.map((src) => (
-                    <img key={src} src={asset(src)} alt="" />
-                  ))
-                : l.kind === 'section'
+                ? l.logos.map((src, i) =>
+                    // a logo not yet supplied holds its place as a dashed ring
+                    src ? (
+                      <img key={src} src={asset(src)} alt="" />
+                    ) : (
+                      <span key={`slot${i}`} className="sx-slot">
+                        Logo
+                      </span>
+                    ),
+                  )
+                : l.kind === 'section' || l.kind === 'pill'
                   ? <span className="sx-label__pill">{l.text}</span>
                   : l.text}
             </div>
@@ -199,6 +207,7 @@ export default function Schema({ state }) {
             n.plain && 'sx--plain',
             n.flow !== undefined && 'sx--flow',
             n.badge && 'sx--badge',
+            n.pill && 'sx--tag',
             icon && 'sx--icon',
             pic && 'sx--pic',
             pic && !n.art && 'sx--empty',
@@ -223,6 +232,9 @@ export default function Schema({ state }) {
               }}
             >
               {n.art && <img className="sx__pic" src={asset(n.art)} alt="" />}
+              {n.slot && (
+                <img className="sx__icon sx__slot-logo" src={asset(n.slot)} alt="" />
+              )}
               {icon && (
                 <img
                   className="sx__icon"

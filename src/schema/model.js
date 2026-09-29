@@ -30,6 +30,13 @@ const box = (id, label, tier, extra) => ({ id, label, tier, ...extra })
  */
 const BADGE = { h: 46, font: 17, radius: 10, badge: true }
 
+/** A tag rather than a box: a lime pill, centred in its column at its own
+ *  width, for something that belongs to the box above it. */
+const PILL = { h: 34, font: 15, radius: 999, pill: true, pillW: 172 }
+
+/** A badge tall enough for a two-line label. */
+const ENGINE = { ...BADGE, h: 62 }
+
 /**
  * A card is a badge with a picture above it — one tree node, drawn as two
  * rectangles. `art` is the image it shows; null holds the space as a
@@ -172,14 +179,14 @@ export const TREE = {
                 columns: [
                   {
                     items: [
-                      box('modelA', 'Model', 3),
-                      box('profileA', 'Customer Profile', 3),
+                      box('modelA', 'Local Model', 3),
+                      box('profileA', 'Customer Profile', 3, PILL),
                     ],
                   },
                   {
                     items: [
-                      box('modelB', 'Model', 3),
-                      box('profileB', 'Customer Profile', 3),
+                      box('modelB', 'Local Model', 3),
+                      box('profileB', 'Customer Profile', 3, PILL),
                     ],
                   },
                 ],
@@ -188,15 +195,28 @@ export const TREE = {
             {
               ...box('compute', 'Compute', 2),
               kids: {
-                // two by two rather than four across: at a quarter of the
-                // column "Massive-parallel processing" would break three ways
-                layout: 'grid',
-                cols: 2,
-                items: [
-                  box('mpp', 'Massive-parallel processing', 3, BADGE),
-                  box('inmemory', 'In-memory', 3, BADGE),
-                  box('aisearch', 'AI search', 3, BADGE),
-                  box('realtime', 'Real-time', 3, BADGE),
+                // how data gets in and out sits over Compute, the engines
+                // that run on it under; the connectors row is inset to leave
+                // room for the arrows that lead out of it on either side
+                layout: 'rows',
+                rows: [
+                  {
+                    above: true,
+                    inset: 56,
+                    items: [
+                      box('connectors', 'Connectors', 3, BADGE),
+                      box('flexconnect', 'Flex Connect', 3, BADGE),
+                    ],
+                  },
+                  {
+                    // a third of the band each, so the labels take two lines
+                    // and the badges stand taller to hold them
+                    items: [
+                      box('mpp', 'MPP Engine', 3, ENGINE),
+                      box('inmemory', 'In-memory Datamart', 3, ENGINE),
+                      box('realtime', 'Real-time', 3, ENGINE),
+                    ],
+                  },
                 ],
               },
             },
@@ -234,7 +254,6 @@ export const ICONS = {
   mcp: '/media/icon-plug.png',
   mpp: '/media/icon-mpp.png',
   inmemory: '/media/icon-memory.png',
-  aisearch: '/media/icon-search.png',
   realtime: '/media/icon-time.png',
   structured: '/media/icon-table.png',
   documents: '/media/icon-documents.png',
@@ -335,29 +354,24 @@ export const STATES = {
     focus: null,
   },
 
+  // the three layers of Infrastructure, folded: each is opened on its own
   infra: {
-    expand: ['infra', 'compute', 'storage'],
+    expand: ['infra'],
     parent: ['infra'],
-    hl: [
-      'inference',
-      'compute',
-      'mpp',
-      'inmemory',
-      'aisearch',
-      'realtime',
-      'storage',
-      'structured',
-      'documents',
-    ],
+    hl: ['inference', 'compute', 'storage'],
     focus: { sub: ['infra'] },
   },
 
-  open: {
+  // Storage behind one catalog: our compute and outside engines all read
+  // through it, and sources feed it from below. Storage drops to make room
+  // for the catalog between it and Compute.
+  storage: {
     expand: ['infra'],
-    hl: ['inference', 'compute', 'storage'],
     parent: ['infra'],
-    widths: { inference: 336, compute: 336, storage: 336 },
-    arrows: 'open',
+    hl: ['storage'],
+    gaps: { storage: 112 },
+    slots: { storage: '/media/icon-iceberg.png' },
+    arrows: 'catalog',
     focus: { sub: ['infra'] },
   },
 
@@ -371,13 +385,19 @@ export const STATES = {
     focus: { sub: ['infra'] },
   },
 
+  // Compute opened up: connectors out to either side, and the engines below
+  // all running on the one storage. Compute and its engines are the point;
+  // the connectors are set a step down, as the way in and out, and storage
+  // is only where the engines land.
   separation: {
     expand: ['infra', 'compute'],
-    hide: ['aisearch', 'realtime'],
-    hl: ['compute', 'mpp', 'inmemory', 'storage'],
+    hl: ['compute', 'mpp', 'inmemory', 'realtime'],
     parent: ['infra'],
+    ctx: ['connectors', 'flexconnect'],
     tails: { compute: 44 },
     arrows: 'merge',
+    merge: ['mpp', 'inmemory', 'realtime'],
+    sideways: { connectors: 'left', flexconnect: 'right' },
     focus: { sub: ['infra'] },
   },
 
@@ -400,7 +420,7 @@ export const STATE_ORDER = [
   'lifecycle',
   'tenants',
   'infra',
-  'open',
+  'storage',
   'colocated',
   'separation',
   'inference',

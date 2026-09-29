@@ -15,7 +15,6 @@ import S14Launch from './S14Launch.jsx'
 import S17MultiTenant from './S17MultiTenant.jsx'
 import S20Lifecycle from './S20Lifecycle.jsx'
 import S21Box from './S21Box.jsx'
-import S22Open from './S22Open.jsx'
 import S25Separation from './S25Separation.jsx'
 import S26Inference from './S26Inference.jsx'
 import S27Infra from './S27Infra.jsx'
@@ -25,6 +24,7 @@ import S30Management from './S30Management.jsx'
 import S31GovernanceTools from './S31GovernanceTools.jsx'
 import S32Why from './S32Why.jsx'
 import S33Taxonomy from './S33Taxonomy.jsx'
+import S34Storage from './S34Storage.jsx'
 
 /** Presentation order. Reorder here to reorder the deck. */
 const slides = [
@@ -51,7 +51,7 @@ const slides = [
   S20Lifecycle,
   S17MultiTenant,
   S27Infra,
-  S22Open,
+  S34Storage,
   S25Separation,
   S26Inference,
   S32Why,

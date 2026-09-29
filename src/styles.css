@@ -1291,6 +1291,21 @@ li {
   opacity: 1;
 }
 
+/* A tag hanging off the box above it: solid lime when lit, like the pills
+   elsewhere in the deck, and an outline otherwise. */
+.sx.sx--tag {
+  padding: 0 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  box-shadow: none;
+}
+
+.sx.sx--tag.sx--hl {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--ink);
+}
+
 /* Named but not highlighted: full-strength text in a neutral box, for boxes
    that sit inside a highlighted structure rather than being the subject. */
 .sx--plain {
@@ -1368,6 +1383,41 @@ li {
   width: 42px;
   height: 42px;
   display: block;
+}
+
+/* A pill that is a node of the drawing in its own right (the catalog), sized
+   by the layout rather than by its text so arrows can meet its edges. */
+.sx-label--pill {
+  height: 38px;
+  align-items: stretch;
+}
+
+.sx-label--pill .sx-label__pill {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+}
+
+/* A logo still to come: a dashed ring holding its place. */
+.sx-slot {
+  width: 42px;
+  height: 42px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1.5px dashed var(--faint);
+  color: var(--faint);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* A logo set inside a box on one slide only, where a layer icon would sit. */
+.sx__slot-logo {
+  opacity: 1;
 }
 
 /* --------------------------------------------- grouping frames and arrows  */
