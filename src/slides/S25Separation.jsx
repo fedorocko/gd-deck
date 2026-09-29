@@ -8,7 +8,7 @@ export default function S25Separation() {
       note={
         <>
           We help you run your compute workflow for{' '}
-          <Mark keep>less</Mark>.
+          <Mark keep>less.</Mark>
         </>
       }
       kpis={[{ value: '30%', label: 'savings on compute' }]}

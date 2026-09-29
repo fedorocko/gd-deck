@@ -3,7 +3,8 @@ import Badges from '../components/Badges.jsx'
 import Kpis from '../components/Kpis.jsx'
 
 /** Large text on the left, media on the right.
- *  kpis: [{ value, label }] — the numbers that back the claim up. */
+ *  kpis: [{ value, label }] — the numbers that back the claim up.
+ *  quietBadges: set the badges back as supporting detail. */
 export default function SplitLayout({
   eyebrow,
   title,
@@ -11,6 +12,7 @@ export default function SplitLayout({
   kicker,
   kpis,
   badges,
+  quietBadges = false,
   mediaName,
   titleClass = 'h1',
   variant,
@@ -28,7 +30,7 @@ export default function SplitLayout({
           {subtitle && <p className="body">{subtitle}</p>}
           {kicker && <p className="kicker">{kicker}</p>}
           {kpis && <Kpis items={kpis} />}
-          {badges && <Badges items={badges} />}
+          {badges && <Badges items={badges} quiet={quietBadges} />}
         </div>
         <Media name={mediaName} className={cx('split__media')} />
       </div>

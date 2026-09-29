@@ -1,4 +1,5 @@
 import CardsLayout from '../layouts/CardsLayout.jsx'
+import { ACCURACY, LATENCY } from '../benchmarks.js'
 import Mark from '../components/Mark.jsx'
 
 // The four promises made over the course of the architecture run, collected in
@@ -13,9 +14,9 @@ export default function S32Why() {
           id: 'build',
           text: (
             <>
-              We help you implement new solutions{' '}
+              It lets you implement new solutions{' '}
               <Mark keep>faster</Mark> and with{' '}
-              <Mark keep>less risk</Mark>.
+              <Mark keep>less risk.</Mark>
             </>
           ),
         },
@@ -25,7 +26,7 @@ export default function S32Why() {
             <>
               We help you build{' '}
               <Mark keep>new use-cases</Mark> and become an{' '}
-              <Mark keep>AI leader</Mark>.
+              <Mark keep>AI leader.</Mark>
             </>
           ),
         },
@@ -34,7 +35,7 @@ export default function S32Why() {
           text: (
             <>
               We help you run your compute workflow for{' '}
-              <Mark keep>less</Mark>.
+              <Mark keep>less.</Mark>
             </>
           ),
         },
@@ -52,6 +53,8 @@ export default function S32Why() {
       kpis={[
         { value: '30%', label: 'savings on compute' },
         { value: '20%', label: 'savings on token costs' },
+        ACCURACY,
+        LATENCY,
       ]}
     />
   )

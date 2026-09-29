@@ -7,7 +7,7 @@ export default function S30Management() {
       statement={
         <>
           Management tools help you configure and launch new solutions to
-          production with <Mark>confidence</Mark>.
+          production with <Mark>confidence.</Mark>
         </>
       }
     />

@@ -299,6 +299,19 @@ li {
   white-space: nowrap;
 }
 
+/* Quiet: the features behind a claim, listed but not competing with it. */
+.badges--quiet {
+  gap: 10px;
+}
+
+.badges--quiet .badge {
+  font-size: 17px;
+  padding: 10px 16px;
+  background: transparent;
+  color: var(--muted);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
 /* ------------------------------------------------- emphasis inside a line */
 /* Every variant is sized in em, so a marked phrase scales with whatever it is
    set in — a 44px statement or a 24px list item — and keeps the same weight
@@ -693,6 +706,7 @@ li {
 /* On a section slide the kicker is a subheading under the statement, not a
    marginal note, so it is set larger and allowed a wider measure. */
 .sectionblock .kicker {
+  text-wrap: balance;
   font-size: 30px;
   color: var(--muted);
   max-width: 48ch;
@@ -1041,6 +1055,29 @@ li {
   display: flex;
   gap: 72px;
   margin: 0;
+}
+
+/* In a split's text column the figures share one row: the gap closes up and
+   each label breaks onto two even lines rather than wherever it runs out. */
+.split__text .kpis {
+  gap: 48px;
+}
+
+.split__text .kpi__label {
+  max-width: 140px;
+}
+
+.kpi__star {
+  font-size: 0.5em;
+  vertical-align: 0.8em;
+  margin-left: 0.06em;
+}
+
+.kpis__note {
+  margin-top: 20px;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--faint);
 }
 
 .kpis--stack {

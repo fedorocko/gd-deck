@@ -7,8 +7,8 @@ export default function S14Launch() {
       title="Agentic Serving Plane capabilities"
     >
       <p className="kicker">
-        They help us successfully launch a secure and tailored solution for
-        each customer.
+        10 years of architecture innovation and layering that helped us
+        successfully launch a secure and tailored solution for each customer.
       </p>
     </SectionLayout>
   )

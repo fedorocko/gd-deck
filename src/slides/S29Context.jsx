@@ -7,7 +7,7 @@ export default function S29Context() {
       statement={
         <>
           All UI apps and agents run on definitions and context{' '}
-          <Mark>specific to your business</Mark>.
+          <Mark>specific to your business.</Mark>
         </>
       }
       list={[

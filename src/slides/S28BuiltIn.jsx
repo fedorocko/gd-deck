@@ -14,7 +14,7 @@ export default function S28BuiltIn() {
         <>
           We help you build{' '}
           <Mark keep>new use-cases</Mark> and become an{' '}
-          <Mark keep>AI leader</Mark>.
+          <Mark keep>AI leader.</Mark>
         </>
       }
     />
