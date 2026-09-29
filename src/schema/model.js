@@ -328,7 +328,10 @@ export const STATES = {
   tenants: {
     mode: 'tenants',
     expand: [],
+    // the subject is the tree — one stack fanned out to many — so the lime
+    // goes on its frames and arrows; the boxes inside are only named
     hl: [],
+    plain: ['interfaces', 'mgmt', 't1i', 't1m', 't2i', 't2m', 't3i', 't3m'],
     focus: null,
   },
 

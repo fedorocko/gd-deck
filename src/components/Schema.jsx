@@ -101,7 +101,7 @@ export default function Schema({ state }) {
           return (
             <div
               key={id}
-              className="sx-frame"
+              className={f.strong ? 'sx-frame sx-frame--strong' : 'sx-frame'}
               style={{
                 transform: `translate(${f.x}px, ${f.y}px)`,
                 width: f.w,
@@ -196,6 +196,7 @@ export default function Schema({ state }) {
             'sx',
             n.hl && 'sx--hl',
             n.ctx && 'sx--ctx',
+            n.plain && 'sx--plain',
             n.flow !== undefined && 'sx--flow',
             n.badge && 'sx--badge',
             icon && 'sx--icon',

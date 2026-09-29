@@ -341,6 +341,8 @@ const TENANT_M_H = 66
 const MASTER_H = MASTER_PAD * 2 + MASTER_BOX_H * 2 + 10
 const TENANT_Y = MASTER_H + 62
 const TENANT_H = TENANT_PAD * 2 + TENANT_I_H + 8 + TENANT_M_H
+/** Air between a tenant's frame and the name set under it. */
+const TENANT_TAG_GAP = 10
 
 const tenantX = (i) => i * (TENANT_W + TENANT_GAP)
 const tenantCx = (i) => tenantX(i) + TENANT_W / 2
@@ -357,6 +359,7 @@ function layoutTenants(state, out) {
       font,
       radius,
       hl: false,
+      plain: !!state.plain?.includes(id),
       visible: true,
     })
 
@@ -380,6 +383,7 @@ function layoutTenants(state, out) {
     y: 0,
     w: MASTER_W,
     h: MASTER_H,
+    strong: true,
     visible: true,
   })
 
@@ -393,6 +397,18 @@ function layoutTenants(state, out) {
       y: TENANT_Y,
       w: TENANT_W,
       h: TENANT_H,
+      strong: true,
+      visible: true,
+    })
+    // each tenant named under its copy, in the pill the section titles use
+    out.labels.set(`tenant:${i + 1}`, {
+      id: `tenant:${i + 1}`,
+      kind: 'section',
+      text: `Workspace ${i + 1}`,
+      x: tx,
+      y: TENANT_Y + TENANT_H + TENANT_TAG_GAP,
+      w: TENANT_W,
+      hl: true,
       visible: true,
     })
     put(`t${i + 1}i`, 'Interfaces', tx + TENANT_PAD, TENANT_Y + TENANT_PAD, tw, TENANT_I_H, 15, 10)
@@ -410,7 +426,7 @@ function layoutTenants(state, out) {
 
   // One shared infrastructure underneath them all.
   const t1 = TIERS[1]
-  const iy = TENANT_Y + TENANT_H + 26
+  const iy = TENANT_Y + TENANT_H + TENANT_TAG_GAP + PILL_H + 22
   put('infra', 'Infrastructure', 0, iy, COL_W, t1.h, t1.font, t1.radius)
 }
 
