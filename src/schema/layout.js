@@ -139,6 +139,7 @@ function placeNode(node, state, x, y, w, out, artPad = 0) {
     radius: node.radius ?? t.radius,
     badge: node.badge,
     pill: node.pill,
+    soon: node.soon,
     hl: state.hl.includes(node.id),
     // a placeholder for a logo set inside the box, named for what goes there
     slot: state.slots?.[node.id],
@@ -511,6 +512,7 @@ function parkHidden(node, out, anchor) {
       radius: node.radius ?? t.radius,
       badge: node.badge,
       pill: node.pill,
+      soon: node.soon,
       ...parked,
     })
   }

@@ -251,6 +251,28 @@ export default function Schema({ state }) {
             </div>
           )
         })}
+
+        {/* Drawn over the boxes rather than inside them: a flow box clips its
+            sweep, and would clip a sticker hanging off its corner with it.
+            Translating to the box's right edge on the box's own curve keeps
+            the sticker pinned to the corner while the box moves and resizes. */}
+        {ORDER.nodes.map((id) => {
+          const n = model.nodes.get(id)
+          if (!n.soon) return null
+          return (
+            <div
+              key={`${id}-soon`}
+              className="sx-soon"
+              style={{
+                transform: `translate(${n.x + n.w}px, ${n.y}px)`,
+                opacity: n.visible ? 1 : 0,
+                '--d': delay(id),
+              }}
+            >
+              <span>Soon</span>
+            </div>
+          )
+        })}
       </div>
     </div>
   )

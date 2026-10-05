@@ -8,6 +8,8 @@ import asset from '../asset.js'
  * letter enlarged.
  * titleFit: hold the heading to a single line, sized down to fit the stage.
  * artSlot: hold open the space an icon would take, for art still to come.
+ * iconSmall: set the icons small above the head, a marker rather than art.
+ * itemsSmall: set the bullets well under the head, as supporting detail.
  */
 export default function ColumnsLayout({
   title,
@@ -15,6 +17,8 @@ export default function ColumnsLayout({
   columns,
   iconBelow = false,
   artSlot = false,
+  iconSmall = false,
+  itemsSmall = false,
   titleFit = false,
   variant,
 }) {
@@ -29,10 +33,16 @@ export default function ColumnsLayout({
       <div
         className={`cols cols--${columns.length} ${variant ? `cols--${variant}` : ''}`.trim()}
       >
-        {columns.map((col) => (
-          <div className="col" key={col.head}>
+        {columns.map((col, i) => (
+          <div className="col" key={i}>
             {col.icon && !iconBelow && (
-              <img className="col__icon" src={asset(col.icon)} alt="" />
+              <img
+                className={
+                  iconSmall ? 'col__icon col__icon--small' : 'col__icon'
+                }
+                src={asset(col.icon)}
+                alt=""
+              />
             )}
             <h3 className="colhead">
               {display ? (
@@ -46,7 +56,11 @@ export default function ColumnsLayout({
             </h3>
             {col.body && <p className="col__body">{col.body}</p>}
             {col.items && (
-              <ul className="col__list">
+              <ul
+                className={
+                  itemsSmall ? 'col__list col__list--small' : 'col__list'
+                }
+              >
                 {col.items.map((item) => (
                   <li key={item}>{item}</li>
                 ))}

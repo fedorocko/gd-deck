@@ -512,6 +512,12 @@ li {
   margin: -9px 0 6px -9px;
 }
 
+.col__icon--small {
+  width: 72px;
+  height: 72px;
+  margin: -4px 0 0 -4px;
+}
+
 .col__icon--below {
   /* inset from the column edge so the art sits in the copy's measure rather
      than running the full width */
@@ -573,6 +579,11 @@ li {
   color: var(--muted);
 }
 
+.col__list--small {
+  font-size: 18px;
+  gap: 10px;
+}
+
 .col__list li {
   padding-left: 22px;
   position: relative;
@@ -583,7 +594,7 @@ li {
   content: '';
   position: absolute;
   left: 0;
-  top: 17px;
+  top: 0.75em;
   width: 8px;
   height: 1px;
   background: var(--accent);
@@ -1304,6 +1315,35 @@ li {
   background: var(--accent);
   border-color: var(--accent);
   color: var(--ink);
+}
+
+/* Not shipped yet: a sticker slapped on the box's top-right corner, tilted so
+   it reads as an annotation on the diagram rather than part of it. White, not
+   lime, so it never competes with the slide's highlight. The outer element
+   rides the box's corner; the inner one carries the tilt and the offset. */
+.sx-soon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  pointer-events: none;
+  transition: transform 520ms var(--ease-move), opacity 320ms ease var(--d, 0ms);
+}
+
+.sx-soon span {
+  display: block;
+  transform: translate(-78%, -55%) rotate(8deg);
+  padding: 5px 10px 6px;
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: 0 6px 16px -6px rgba(0, 0, 0, 0.6);
 }
 
 /* Named but not highlighted: full-strength text in a neutral box, for boxes

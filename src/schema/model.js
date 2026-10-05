@@ -34,6 +34,9 @@ const BADGE = { h: 46, font: 17, radius: 10, badge: true }
  *  width, for something that belongs to the box above it. */
 const PILL = { h: 34, font: 15, radius: 999, pill: true, pillW: 172 }
 
+/** Not shipped yet: the box carries a tilted "Soon" sticker on its corner. */
+const SOON = { soon: true }
+
 /** A badge tall enough for a two-line label. */
 const ENGINE = { ...BADGE, h: 62 }
 
@@ -95,7 +98,15 @@ export const TREE = {
               label: 'Building blocks',
               items: [
                 card('sdk', 'SDK', 2, '/media/ss-sdk.png', WIDE),
-                card('mcp', 'MCP', 2, '/media/ss-mcp.png', WIDE),
+                card('mcp', 'MCP/A2A', 2, '/media/ss-mcp.png', WIDE),
+              ],
+            },
+            {
+              // more building blocks, a row of badges under the two cards
+              items: [
+                box('mlfunctions', 'ML functions', 2, BADGE),
+                box('dataflows', 'Data flows', 2, { ...BADGE, ...SOON }),
+                box('aisearch', 'AI Search', 2, BADGE),
               ],
             },
           ],
@@ -157,7 +168,7 @@ export const TREE = {
                 items: [
                   box('evaluations', 'Evaluations', 3),
                   box('observability', 'Observability', 3),
-                  box('selflearning', 'Self-Learning', 3),
+                  box('selflearning', 'Self-Learning', 3, SOON),
                 ],
               },
             },
@@ -171,7 +182,7 @@ export const TREE = {
           layout: 'stack',
           items: [
             {
-              ...box('inference', 'Inference', 2),
+              ...box('inference', 'Inference', 2, SOON),
               kids: {
                 layout: 'branch',
                 lead: box('router', 'Router', 3),
@@ -295,7 +306,16 @@ export const STATES = {
 
   builtin: {
     expand: ['interfaces'],
-    hl: ['copilot', 'analyst', 'publisher', 'sdk', 'mcp'],
+    hl: [
+      'copilot',
+      'analyst',
+      'publisher',
+      'sdk',
+      'mcp',
+      'mlfunctions',
+      'dataflows',
+      'aisearch',
+    ],
     parent: ['interfaces'],
     // the screenshots are too small to read in place, so while the slide is
     // up each one takes a turn growing across its row, its neighbour giving
