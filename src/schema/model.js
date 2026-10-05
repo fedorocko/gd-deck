@@ -224,8 +224,11 @@ export const TREE = {
                     // and the badges stand taller to hold them
                     items: [
                       box('mpp', 'MPP Engine', 3, ENGINE),
-                      box('inmemory', 'In-memory Datamart', 3, ENGINE),
-                      box('realtime', 'Real-time', 3, ENGINE),
+                      box('inmemory', 'In-memory Datamart', 3, {
+                        ...ENGINE,
+                        ...SOON,
+                      }),
+                      box('realtime', 'Real-time', 3, { ...ENGINE, ...SOON }),
                     ],
                   },
                 ],
@@ -260,12 +263,10 @@ export const ICONS = {
   interfaces: '/media/icon-interface.png',
   mgmt: '/media/icon-management.png',
   infra: '/media/icon-Infrastructure.png',
-  // the building blocks and the engines carry a small one at badge size
+  // the building blocks carry a small one at badge size; the engines go
+  // without, three to a row leaves them no room
   sdk: '/media/icon-box.png',
   mcp: '/media/icon-plug.png',
-  mpp: '/media/icon-mpp.png',
-  inmemory: '/media/icon-memory.png',
-  realtime: '/media/icon-time.png',
   structured: '/media/icon-table.png',
   documents: '/media/icon-documents.png',
 }

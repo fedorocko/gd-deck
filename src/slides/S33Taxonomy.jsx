@@ -12,23 +12,20 @@ const TAXONOMY = {
           label: 'Built-in',
           leaves: ['Dashboard Copilot', 'AI Analyst', 'AI Publisher'],
         },
-        { label: 'Building blocks', leaves: ['SDK', 'MCP'] },
+        {
+          label: 'Building blocks',
+          leaves: ['SDK', 'MCP/A2A', 'ML functions', 'Data flows', 'AI Search'],
+        },
       ],
     },
     {
       label: 'Management Tools',
       kids: [
+        { label: 'Context', leaves: ['Data', 'Business', 'Agents'] },
+        { label: 'Governance', leaves: ['Catalog', 'AI Hub', 'Builder'] },
         {
-          label: 'Definitions & Context',
-          leaves: ['Data', 'Business', 'Agents'],
-        },
-        {
-          label: 'Governance & Control',
-          leaves: ['Catalog', 'AI Hub', 'Builder'],
-        },
-        {
-          label: 'Lifecycle Management',
-          leaves: ['Evaluations', 'Observability', 'Self-learning'],
+          label: 'Lifecycle',
+          leaves: ['Evaluations', 'Observability', 'Self-Learning'],
         },
       ],
     },
@@ -37,11 +34,17 @@ const TAXONOMY = {
       kids: [
         {
           label: 'Inference',
-          leaves: ['Router', 'Models', 'Customer profiles'],
+          leaves: ['Router', 'Local Models', 'Customer Profiles'],
         },
         {
           label: 'Compute',
-          leaves: ['Massive-parallel processing', 'In-memory', 'AI search', 'Real-time'],
+          leaves: [
+            'Connectors',
+            'Flex Connect',
+            'MPP Engine',
+            'In-memory Datamart',
+            'Real-time',
+          ],
         },
         { label: 'Storage', leaves: ['Structured data', 'Documents'] },
       ],

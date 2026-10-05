@@ -17,3 +17,15 @@ export const LATENCY = {
   label: 'lower latency',
   footnote: BENCHMARK_NOTE,
 }
+
+/** Query engines, not the model: how our compute compares on the same data. */
+export const CLICKHOUSE = {
+  value: '2.2×',
+  label: 'faster than ClickHouse on the MPP engine',
+}
+
+export const IN_MEMORY_P90 = {
+  value: '<1s',
+  // a non-breaking hyphen keeps "in-memory" whole when the label wraps
+  label: 'P90 latency for in\u2011memory datamarts under 5GB',
+}

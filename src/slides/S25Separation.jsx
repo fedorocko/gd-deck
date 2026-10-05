@@ -1,4 +1,5 @@
 import Mark from '../components/Mark.jsx'
+import { CLICKHOUSE, IN_MEMORY_P90 } from '../benchmarks.js'
 import StatementLayout from '../layouts/StatementLayout.jsx'
 
 export default function S25Separation() {
@@ -11,9 +12,14 @@ export default function S25Separation() {
         </>
       }
       kpis={[
-        { value: '30%', label: 'savings on compute' },
-        // query latency on our engines, not the model benchmark in benchmarks.js
-        { value: '50%', label: 'lower latency' },
+        {
+          value: 'Predictable',
+          label:
+            'cost: not billed per TB like BigQuery, no hidden costs like Snowflake',
+        },
+        { value: '5.5×', label: 'faster than Trino on the MPP engine' },
+        CLICKHOUSE,
+        IN_MEMORY_P90,
       ]}
     />
   )

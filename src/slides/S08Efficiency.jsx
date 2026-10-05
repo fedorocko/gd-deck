@@ -1,5 +1,10 @@
 import Mark from '../components/Mark.jsx'
-import { ACCURACY, LATENCY } from '../benchmarks.js'
+import {
+  ACCURACY,
+  CLICKHOUSE,
+  IN_MEMORY_P90,
+  LATENCY,
+} from '../benchmarks.js'
 import SplitLayout from '../layouts/SplitLayout.jsx'
 
 export default function S08Efficiency() {
@@ -12,7 +17,8 @@ export default function S08Efficiency() {
       }
       subtitle="So every agent’s operation is optimized, with predictable cost, latency and high accuracy."
       kpis={[
-        { value: '30%', label: 'savings on compute' },
+        CLICKHOUSE,
+        IN_MEMORY_P90,
         { value: '20%', label: 'savings on token costs' },
         ACCURACY,
         LATENCY,

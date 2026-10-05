@@ -6,7 +6,8 @@ import Kpis from '../components/Kpis.jsx'
  * cards: [{ id, text }] — the claim in the card's own words.
  * cols: how many boxes across; the rest wrap onto the next row.
  * kpis: figures set beside the boxes rather than inside them, so they read as
- * the slide's evidence and not as part of any one claim.
+ * the slide's evidence and not as part of any one claim. More than four would
+ * outrun the slide in one stack, so they go two to a row.
  */
 export default function CardsLayout({
   title,
@@ -29,7 +30,13 @@ export default function CardsLayout({
             </li>
           ))}
         </ul>
-        {kpis && <Kpis items={kpis} stack />}
+        {kpis && (
+          <Kpis
+            items={kpis}
+            stack={kpis.length <= 4}
+            cols={kpis.length > 4 ? 2 : undefined}
+          />
+        )}
       </div>
     </section>
   )

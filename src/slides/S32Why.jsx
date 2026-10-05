@@ -1,5 +1,10 @@
 import CardsLayout from '../layouts/CardsLayout.jsx'
-import { ACCURACY, LATENCY } from '../benchmarks.js'
+import {
+  ACCURACY,
+  CLICKHOUSE,
+  IN_MEMORY_P90,
+  LATENCY,
+} from '../benchmarks.js'
 import Mark from '../components/Mark.jsx'
 
 // The four promises made over the course of the architecture run, collected in
@@ -51,7 +56,8 @@ export default function S32Why() {
         },
       ]}
       kpis={[
-        { value: '30%', label: 'savings on compute' },
+        CLICKHOUSE,
+        IN_MEMORY_P90,
         { value: '20%', label: 'savings on token costs' },
         ACCURACY,
         LATENCY,

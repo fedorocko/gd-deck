@@ -4,7 +4,8 @@ import Kpis from '../components/Kpis.jsx'
  * One claim on the left, art or a diagram on the right.
  * note: a second, quieter line under the claim — what it gets you. It is set
  * below the points, so a claim that opens onto a list keeps hold of it.
- * kpis: [{ value, label }] — the numbers that back the note up.
+ * kpis: [{ value, label }] — the numbers that back the note up. Four are set
+ * two by two, since a row of them would outrun the column.
  * list: numbered points that carry the claim's detail — a string, or
  * { head, body } when the point needs a name over its gloss.
  * listLead: the points are the slide's content rather than a gloss on it, so
@@ -44,7 +45,7 @@ export default function StatementLayout({
             </ol>
           )}
           {note && <p className="statement__note">{note}</p>}
-          {kpis && <Kpis items={kpis} />}
+          {kpis && <Kpis items={kpis} cols={kpis.length > 3 ? 2 : undefined} />}
         </div>
         {children || <div className="statement__slot" aria-hidden="true" />}
       </div>
