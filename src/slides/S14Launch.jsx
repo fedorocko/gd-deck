@@ -1,3 +1,4 @@
+import Taxonomy from '../components/Taxonomy.jsx'
 import SectionLayout from '../layouts/SectionLayout.jsx'
 
 export default function S14Launch() {
@@ -5,6 +6,7 @@ export default function S14Launch() {
     <SectionLayout
       eyebrow="Architecture"
       title="Agentic Serving Plane capabilities"
+      aside={<Taxonomy />}
     >
       <p className="kicker">
         10 years of architecture innovation and layering that helped us

@@ -244,6 +244,12 @@ li {
   font-weight: 600;
 }
 
+.colhead--large {
+  font-size: 56px;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+}
+
 .body {
   font-size: 26px;
   line-height: 1.45;
@@ -503,6 +509,18 @@ li {
   display: flex;
   flex-direction: column;
   gap: 22px;
+}
+
+/* Large heads run to uneven line counts; share the rows across columns so the
+   bullets still start on one line. */
+.cols--heads-large {
+  grid-template-rows: auto auto 1fr;
+}
+.cols--heads-large .col {
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+  row-gap: 22px;
 }
 
 .col__icon {

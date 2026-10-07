@@ -8,12 +8,13 @@ export default function S04Readiness() {
       titleFit
       iconSmall
       itemsSmall
+      headLarge
       columns={[
         {
           icon: '/media/icon-start.png',
           head: (
             <>
-              You have systems that agents can <Mark>start</Mark> working with.
+              <Mark>Start</Mark> with agentic-ready systems
             </>
           ),
           items: [
@@ -25,8 +26,7 @@ export default function S04Readiness() {
           icon: '/media/icon-secure.png',
           head: (
             <>
-              You can keep your data and IP <Mark>secure</Mark> while agents
-              access it.
+              Keep your data <Mark>Secure</Mark>
             </>
           ),
           items: [
@@ -38,8 +38,7 @@ export default function S04Readiness() {
           icon: '/media/icon-spend.png',
           head: (
             <>
-              You can grow your AI usage while keeping <Mark>spend</Mark> under
-              control.
+              Grow usage and control <Mark>Spend</Mark>
             </>
           ),
           items: [
@@ -51,8 +50,7 @@ export default function S04Readiness() {
           icon: '/media/icon-success.png',
           head: (
             <>
-              Your AI deployments will <Mark>succeed</Mark> by bringing tangible
-              value to the company.
+              <Mark>Succeed</Mark> through real value
             </>
           ),
           items: [

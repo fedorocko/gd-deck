@@ -10,6 +10,7 @@ import asset from '../asset.js'
  * artSlot: hold open the space an icon would take, for art still to come.
  * iconSmall: set the icons small above the head, a marker rather than art.
  * itemsSmall: set the bullets well under the head, as supporting detail.
+ * headLarge: set short heads large, so they carry the column.
  */
 export default function ColumnsLayout({
   title,
@@ -19,6 +20,7 @@ export default function ColumnsLayout({
   artSlot = false,
   iconSmall = false,
   itemsSmall = false,
+  headLarge = false,
   titleFit = false,
   variant,
 }) {
@@ -31,7 +33,14 @@ export default function ColumnsLayout({
         {subtitle && <p className="kicker">{subtitle}</p>}
       </header>
       <div
-        className={`cols cols--${columns.length} ${variant ? `cols--${variant}` : ''}`.trim()}
+        className={[
+          'cols',
+          `cols--${columns.length}`,
+          variant && `cols--${variant}`,
+          headLarge && 'cols--heads-large',
+        ]
+          .filter(Boolean)
+          .join(' ')}
       >
         {columns.map((col, i) => (
           <div className="col" key={i}>
@@ -44,7 +53,9 @@ export default function ColumnsLayout({
                 alt=""
               />
             )}
-            <h3 className="colhead">
+            <h3
+              className={headLarge ? 'colhead colhead--large' : 'colhead'}
+            >
               {display ? (
                 <>
                   <span className="colhead__lead">{col.head.slice(0, 1)}</span>
