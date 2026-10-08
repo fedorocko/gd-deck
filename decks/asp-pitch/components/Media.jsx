@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import assetUrl from '../../../shared/asset.js'
 import media from '../media.js'
 
@@ -17,10 +18,35 @@ export default function Media({ name, className = '', style }) {
   return (
     <div className={cls} style={style}>
       {asset.kind === 'video' ? (
-        <video src={assetUrl(asset.src)} autoPlay muted loop playsInline />
+        <Video src={assetUrl(asset.src)} plays={asset.plays} />
       ) : (
         <img src={assetUrl(asset.src)} alt="" />
       )}
     </div>
+  )
+}
+
+/** Loops forever, or `plays` times and then rests on the last frame. The
+ *  slide remounts on every visit, so the count starts over each time. */
+function Video({ src, plays }) {
+  const played = useRef(0)
+
+  const onEnded = (e) => {
+    played.current += 1
+    if (played.current < plays) {
+      e.currentTarget.currentTime = 0
+      e.currentTarget.play()
+    }
+  }
+
+  return (
+    <video
+      src={src}
+      autoPlay
+      muted
+      loop={!plays}
+      playsInline
+      onEnded={plays ? onEnded : undefined}
+    />
   )
 }

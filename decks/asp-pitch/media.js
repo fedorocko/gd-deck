@@ -1,7 +1,8 @@
 /**
  * Slide media. Drop real files into `public/media/` and point the `src` here
  * (e.g. src: '/media/datev-office.jpg'). While `src` is null the slide renders
- * a labelled placeholder frame instead.
+ * a labelled placeholder frame instead. A video loops while its slide is up,
+ * unless `plays` caps it — then it runs that many times and holds the last frame.
  */
 const media = {
   future: {
@@ -12,21 +13,25 @@ const media = {
   pillarLanguage: {
     src: '/media/pil-1.mp4',
     kind: 'video',
+    plays: 3,
     label: 'Portrait — agent / interface imagery',
   },
   pillarPrivate: {
     src: '/media/pil-2.mp4',
     kind: 'video',
+    plays: 3,
     label: 'Portrait — on-premise / data centre',
   },
   pillarEfficiency: {
     src: '/media/pil-3.mp4',
     kind: 'video',
+    plays: 3,
     label: 'Portrait — scale / throughput',
   },
   pillarCreativity: {
     src: '/media/pil-4.mp4',
     kind: 'video',
+    plays: 3,
     label: 'Portrait — open architecture / craft',
   },
   datev: { src: '/media/datev.jpeg', label: 'Photo — Datev office' },
