@@ -1,4 +1,4 @@
-name: Deploy deck to GitHub Pages
+name: Deploy decks to GitHub Pages
 
 on:
   push:

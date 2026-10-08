@@ -1,6 +1,4 @@
 import { useCallback, useEffect, useState } from 'react'
-import Schema from './components/Schema.jsx'
-import slides from './slides/index.js'
 import useStageScale, { STAGE_H, STAGE_W } from './useStageScale.js'
 
 // Hairline progress bar along the bottom edge. Set to false to remove it.
@@ -9,10 +7,10 @@ const SHOW_PROGRESS = true
 const PREV_KEYS = ['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace']
 const NEXT_KEYS = ['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter']
 
-const clamp = (i) => Math.min(slides.length - 1, Math.max(0, i))
+const clamp = (i, count) => Math.min(count - 1, Math.max(0, i))
 
 /** Nearest slide from `from` in direction `dir` that `ok` accepts, or -1. */
-function seek(from, dir, ok) {
+function seek(slides, from, dir, ok) {
   for (let i = from; i >= 0 && i < slides.length; i += dir) {
     if (ok(slides[i])) return i
   }
@@ -20,29 +18,38 @@ function seek(from, dir, ok) {
 }
 
 /** The hash carries a 1-based slide number, so `#7` is the seventh slide. */
-function indexFromHash() {
+function indexFromHash(count) {
   const n = Number.parseInt(window.location.hash.slice(1), 10)
-  return Number.isFinite(n) ? clamp(n - 1) : 0
+  return Number.isFinite(n) ? clamp(n - 1, count) : 0
 }
 
-export default function App() {
-  const [index, setIndex] = useState(indexFromHash)
+/**
+ * One presentation: the scaled stage, navigation, the URL hash and presenting.
+ *
+ * slides: components in running order. A slide marked `internal = true` is
+ *   skipped while presenting.
+ * overlay: given the current slide, returns what to render on the stage
+ *   outside the keyed slide — so it survives the slide change instead of
+ *   being remounted with it.
+ */
+export default function Deck({ slides, overlay }) {
+  const [index, setIndex] = useState(() => indexFromHash(slides.length))
   // Presenting = full screen with internal slides skipped. The index stays a
   // position in the full deck so `#N` means the same slide in both modes.
   const [presenting, setPresenting] = useState(false)
   const scale = useStageScale()
 
   const shown = useCallback((s) => !(presenting && s.internal), [presenting])
-  const first = seek(0, 1, shown)
-  const last = seek(slides.length - 1, -1, shown)
+  const first = seek(slides, 0, 1, shown)
+  const last = seek(slides, slides.length - 1, -1, shown)
 
   const go = useCallback(
     (delta) =>
       setIndex((i) => {
-        const next = seek(i + delta, Math.sign(delta), shown)
+        const next = seek(slides, i + delta, Math.sign(delta), shown)
         return next === -1 ? i : next
       }),
-    [shown],
+    [slides, shown],
   )
 
   const present = () => {
@@ -50,8 +57,8 @@ export default function App() {
     // Land on a client-facing slide if we are sitting on an internal one.
     setIndex((i) => {
       const ok = (s) => !s.internal
-      const next = seek(i, 1, ok)
-      return next === -1 ? seek(i, -1, ok) : next
+      const next = seek(slides, i, 1, ok)
+      return next === -1 ? seek(slides, i, -1, ok) : next
     })
     document.documentElement.requestFullscreen?.().catch(() => {})
   }
@@ -82,10 +89,10 @@ export default function App() {
 
   // Someone editing the hash by hand, or a restored session, moves the deck.
   useEffect(() => {
-    const onHashChange = () => setIndex(indexFromHash())
+    const onHashChange = () => setIndex(indexFromHash(slides.length))
     window.addEventListener('hashchange', onHashChange)
     return () => window.removeEventListener('hashchange', onHashChange)
-  }, [])
+  }, [slides])
 
   useEffect(() => {
     const onKey = (e) => {
@@ -129,10 +136,7 @@ export default function App() {
         {/* key remounts the slide so the entrance animation replays */}
         <Slide key={index} />
 
-        {/* Slides that carry a schema state share one diagram. It lives out
-            here, unkeyed, so it survives the slide change and animates from
-            the previous state instead of being redrawn. */}
-        {Slide.schema && <Schema state={Slide.schema} />}
+        {overlay?.(Slide)}
       </div>
 
       <button

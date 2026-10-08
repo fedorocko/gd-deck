@@ -1,4 +1,4 @@
-import assetUrl from '../asset.js'
+import assetUrl from '../../../shared/asset.js'
 import media from '../media.js'
 
 /** Renders the asset for `name`, or a labelled placeholder until it exists. */

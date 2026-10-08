@@ -1,4 +1,4 @@
-import asset from '../asset.js'
+import asset from '../../../shared/asset.js'
 
 /**
  * Full-bleed title statement.

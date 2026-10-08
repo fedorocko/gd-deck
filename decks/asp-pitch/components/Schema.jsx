@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import asset from '../asset.js'
+import asset from '../../../shared/asset.js'
 import { ICONS, STATES } from '../schema/model.js'
 import {
   MODELS,

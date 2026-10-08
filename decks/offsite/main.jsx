@@ -1,10 +1,11 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './styles.css'
-import App from './App.jsx'
+import '../../shared/deck.css'
+import Deck from '../../shared/Deck.jsx'
+import slides from './slides/index.js'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <Deck slides={slides} />
   </StrictMode>,
 )
