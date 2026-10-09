@@ -20,6 +20,8 @@
   --ease-move: cubic-bezier(0.22, 0.8, 0.3, 1);
 
   --pad: 120px;
+  /* the speaker notes column, which the next button has to clear */
+  --notes-w: clamp(260px, 24vw, 380px);
   --font: 'Switzer', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica,
     Arial, sans-serif;
   --font-display: 'Funnel Display', 'Switzer', Helvetica, Arial, sans-serif;
@@ -170,6 +172,53 @@ li {
 .nav svg {
   width: 20px;
   height: 20px;
+}
+
+/* -------------------------------------------------------- speaker notes */
+/* A column down the right edge, laid over the slide rather than beside it so
+   the stage keeps its size, and see-through so what it covers can still be
+   made out. Only there for a slide that has notes, and never while presenting
+   (Deck.jsx). Sized in window pixels like the buttons, not in the stage's
+   design space, so the text stays readable in a small window. */
+.notes {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--notes-w);
+  padding: 32px 28px 40px;
+  overflow-y: auto;
+  background: rgba(9, 9, 12, 0.6);
+  border-left: 1px solid var(--line);
+  backdrop-filter: blur(3px);
+  font-size: 17px;
+  line-height: 1.55;
+  z-index: 5;
+}
+
+.notes__label {
+  margin-bottom: 18px;
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+  font-weight: 500;
+}
+
+/* Notes are written a thought to a line: the lines are set close, and a blank
+   line in the text opens a wider gap. */
+.notes p + p {
+  margin-top: 0.45em;
+}
+
+.notes__group + .notes__group {
+  margin-top: 1.3em;
+}
+
+/* The next button moves to the column's edge instead of sitting on the text. */
+.notes ~ .nav--next {
+  right: calc(var(--notes-w) + 28px);
 }
 
 .progress {

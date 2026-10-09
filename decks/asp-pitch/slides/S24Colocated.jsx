@@ -1,4 +1,4 @@
-import StatementLayout from '../layouts/StatementLayout.jsx'
+import StatementLayout from '../../../shared/StatementLayout.jsx'
 
 export default function S24Colocated() {
   return (

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import asset from '../../../shared/asset.js'
-import { ICONS, STATES } from '../schema/model.js'
+import asset from './asset.js'
+import { ICONS, STATES } from './schema/model.js'
 import {
   MODELS,
   ORDER,
@@ -13,10 +13,11 @@ import {
   WORLD_H,
   WORLD_W,
   WORLD_X,
-} from '../schema/layout.js'
+} from './schema/layout.js'
 
 /**
- * The diagram behind slides 16–26.
+ * The diagram behind the platform slides: the ASP pitch's slides 16–26 and
+ * the offsite deck's 14–24.
  *
  * It is mounted once, outside the keyed slide, so it survives every slide
  * change inside that run and animates from one state to the next instead of

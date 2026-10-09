@@ -27,7 +27,9 @@ function indexFromHash(count) {
  * One presentation: the scaled stage, navigation, the URL hash and presenting.
  *
  * slides: components in running order. A slide marked `internal = true` is
- *   skipped while presenting.
+ *   skipped while presenting. One with `notes` — a string, written a thought
+ *   to a line with a blank line between groups — shows them as speaker notes
+ *   in a column down the right, and only outside presenting.
  * overlay: given the current slide, returns what to render on the stage
  *   outside the keyed slide — so it survives the slide change instead of
  *   being remounted with it.
@@ -118,6 +120,8 @@ export default function Deck({ slides, overlay }) {
   const Slide = slides[index]
   const visible = slides.filter(shown)
   const position = visible.indexOf(Slide) + 1
+  // Speaker notes are for whoever is preparing the talk, never for the room.
+  const notes = !presenting && Slide.notes
 
   return (
     <div
@@ -138,6 +142,24 @@ export default function Deck({ slides, overlay }) {
 
         {overlay?.(Slide)}
       </div>
+
+      {/* Before the buttons, so the next one can step out of its way in CSS.
+          key remounts it so a long note starts from the top on every slide. */}
+      {notes && (
+        <aside className="notes" key={index}>
+          <h2 className="notes__label">Speaker notes</h2>
+          {notes
+            .trim()
+            .split(/\n\s*\n/)
+            .map((group, i) => (
+              <div className="notes__group" key={i}>
+                {group.split('\n').map((line, j) => (
+                  <p key={j}>{line}</p>
+                ))}
+              </div>
+            ))}
+        </aside>
+      )}
 
       <button
         className="nav nav--prev"

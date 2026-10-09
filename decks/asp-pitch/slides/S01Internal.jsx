@@ -1,4 +1,4 @@
-import SectionLayout from '../layouts/SectionLayout.jsx'
+import SectionLayout from '../../../shared/SectionLayout.jsx'
 
 // Slide numbers refer to the client-facing deck, i.e. this internal slide
 // excluded: the GoodData.AI title slide is #1.

@@ -1,5 +1,5 @@
-import Mark from '../components/Mark.jsx'
-import StatementLayout from '../layouts/StatementLayout.jsx'
+import Mark from '../../../shared/Mark.jsx'
+import StatementLayout from '../../../shared/StatementLayout.jsx'
 
 export default function S29Context() {
   return (

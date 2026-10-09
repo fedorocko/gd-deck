@@ -1,6 +1,6 @@
-import Mark from '../components/Mark.jsx'
-import { ACCURACY, LATENCY } from '../benchmarks.js'
-import StatementLayout from '../layouts/StatementLayout.jsx'
+import Mark from '../../../shared/Mark.jsx'
+import { ACCURACY, LATENCY } from '../../../shared/benchmarks.js'
+import StatementLayout from '../../../shared/StatementLayout.jsx'
 
 export default function S26Inference() {
   return (

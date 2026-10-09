@@ -6,23 +6,27 @@ http://localhost:5173/gd-decks/asp-pitch/ under `npm run dev`.
 
 ## How it is put together
 
-Paths are relative to this folder. The stage, navigation and design tokens are shared by
-every deck and live in `../../shared/` — see the root `README.md`.
+Paths are relative to this folder. The stage, navigation, design tokens and type scale are
+shared by every deck and live in `../../shared/` — see the root `README.md`. So are `Mark`,
+`Media`, `Backdrop`, `SectionLayout` and `TitleLayout`, which this deck shares with the
+offsite deck, and everything slides 14–27 are built from, since the offsite deck shows
+them too, all but the internal slide 15: `StatementLayout`, `CardsLayout`, `Kpis` and `benchmarks.js`, the `Taxonomy`,
+and the `Schema`.
 
 | Path | What it holds |
 | --- | --- |
 | `slides/index.js` | the running order — **reorder the deck here** |
 | `slides/S01…S34.jsx` | one file per slide, content only |
-| `layouts/` | the layouts every slide is built from |
-| `components/` | the pieces layouts and slides share: badges, figures, marks, media |
-| `schema/` | the animated diagram behind the platform slides |
-| `styles.css` | every style the slides use, on top of the shared tokens |
+| `layouts/` | the layouts that are this deck's own: columns, split and hero |
+| `components/` | the badges under a claim |
+| `../../shared/schema/` | the animated diagram behind the platform slides |
+| `styles.css` | this deck's own styles, on top of `../../shared/deck.css`, `slides.css` and `schema.css` |
 | `media.js` | slide images and video |
 | `main.jsx` | mounts the deck, with the schema as its overlay |
 
-## The schema on slides 15–26
+## The schema on slides 16–26
 
-Those twelve slides share **one diagram** that unfolds as you go, rather than twelve
+Those eleven slides share **one diagram** that unfolds as you go, rather than eleven
 separate pictures. A slide opts in by naming a state:
 
 ```js
@@ -31,13 +35,15 @@ S30Management.schema = 'management'
 
 `main.jsx` hands the diagram to the deck as its `overlay`, which renders outside the keyed
 slide, so it survives the slide change and animates from the previous state instead of being
-redrawn.
+redrawn. The diagram lives in `../../shared/`, because the offsite deck's slides 14–24 are
+these same eleven: a change to it shows in both decks.
 
 | Path | What it holds |
 | --- | --- |
-| `schema/model.js` | the tree of every box, and the twelve states over it |
-| `schema/layout.js` | turns a state into geometry: rectangles, frames, arrows |
-| `components/Schema.jsx` | renders it and stages the timing |
+| `../../shared/schema/model.js` | the tree of every box, and the twelve states over it |
+| `../../shared/schema/layout.js` | turns a state into geometry: rectangles, frames, arrows |
+| `../../shared/Schema.jsx` | renders it and stages the timing |
+| `../../shared/schema.css` | its look, and the timings themselves |
 
 To change what a slide shows, edit its state in `model.js` — `expand` unfolds a branch, `hl`
 highlights, `focus` says what the view centres on. To add a box, put it in the tree; it will
@@ -50,7 +56,7 @@ so a box reads the same size on every slide and size stays legible as rank.
 
 Transitions are plain CSS, staged by delay so a viewer can follow them: boxes shift to make
 room, the view slides to re-centre, and only then do the newly uncovered boxes fade up. No
-animation library is involved; the timings live in the `.schema` block of `styles.css`.
+animation library is involved; the timings live in `../../shared/schema.css`.
 
 ## Swapping in real media
 

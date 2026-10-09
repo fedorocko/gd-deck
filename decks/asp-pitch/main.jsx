@@ -1,9 +1,11 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import '../../shared/deck.css'
+import '../../shared/slides.css'
+import '../../shared/schema.css'
 import './styles.css'
 import Deck from '../../shared/Deck.jsx'
-import Schema from './components/Schema.jsx'
+import Schema from '../../shared/Schema.jsx'
 import slides from './slides/index.js'
 
 // Slides that carry a schema state share one diagram. It is the deck's overlay,

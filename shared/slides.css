@@ -1,0 +1,678 @@
+/* What slides are made of, shared by every deck on top of the tokens in
+   deck.css: the type scale, the marks that pick a phrase out of a line, the
+   media frame, the backdrop (Backdrop.jsx), the title and section slides
+   (TitleLayout.jsx, SectionLayout.jsx), the card and statement slides
+   (CardsLayout.jsx, StatementLayout.jsx) with their figures (Kpis.jsx), and
+   the taxonomy (Taxonomy.jsx). They came from the ASP pitch; a deck adds its
+   own styles after these. The schema diagram has a file to itself,
+   schema.css. */
+
+/* ------------------------------------------------------------ type scale */
+/* Headlines are set in Funnel Display, like the homepage; everything else
+   stays in Switzer. A deck names its own headline classes the same way. */
+.display,
+.h1,
+.h2,
+.h3,
+.titleblock__sub--lead,
+.sub-lede,
+.statement__text,
+.kpi__value {
+  font-family: var(--font-display);
+}
+
+.display {
+  text-wrap: balance;
+  font-size: 112px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+
+.h1 {
+  text-wrap: balance;
+  font-size: 84px;
+  line-height: 1.04;
+  letter-spacing: -0.018em;
+  font-weight: 600;
+}
+
+.h2 {
+  text-wrap: balance;
+  font-size: 64px;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  font-weight: 600;
+}
+
+/* A heading that must read as one line: no wrap, set down to clear the pad. */
+.h2--fit {
+  white-space: nowrap;
+  font-size: 52px;
+  letter-spacing: -0.032em;
+}
+
+.h3 {
+  text-wrap: balance;
+  font-size: 56px;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  font-weight: 600;
+}
+
+.body {
+  font-size: 26px;
+  line-height: 1.45;
+  color: var(--muted);
+  max-width: 30ch;
+}
+
+.eyebrow {
+  font-size: 18px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+  font-weight: 500;
+}
+
+/* Bracketed, as the homepage sets its small caps: [ IN YOUR CLOUD ] */
+.eyebrow::before {
+  content: '[\00a0\00a0';
+}
+.eyebrow::after {
+  content: '\00a0\00a0]';
+}
+
+.kicker {
+  font-size: 22px;
+  line-height: 1.4;
+  color: var(--faint);
+  max-width: 34ch;
+}
+
+.accent {
+  color: var(--accent);
+}
+
+/* ------------------------------------------------- emphasis inside a line */
+/* Every variant is sized in em, so a marked phrase scales with whatever it is
+   set in — a 44px statement or a 24px list item — and keeps the same weight
+   relative to its line. `box-decoration-break: clone` keeps the padding and
+   the rounding on both halves when a phrase wraps. */
+.mk {
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* Held on one line. Only for short phrases: a long one cannot wrap and will
+   run past its column. See Mark.jsx. */
+.mk--keep {
+  white-space: nowrap;
+}
+
+.mk--tint {
+  color: var(--accent);
+}
+
+/* A badge carried inline. The padding is the pill's own air, left to sit on
+   top of the word spacing rather than being pulled back out of it, or the
+   pill's edge ends up almost touching the words either side. Pass `keep` with
+   this variant: a badge that breaks across two lines reads as a mistake. */
+.mk--pill {
+  background: var(--accent);
+  color: var(--ink);
+  font-weight: 500;
+  padding: 0.14em 0.5em 0.18em;
+  border-radius: 999px;
+}
+
+.mk--wash {
+  color: var(--accent);
+  background: var(--accent-wash);
+  box-shadow: inset 0 0 0 1px var(--accent-line);
+  padding: 0.06em 0.26em 0.1em;
+  border-radius: 0.26em;
+}
+
+/* A rule set under the words rather than a border, so it can sit inside the
+   line's descenders instead of below them. */
+.mk--rule {
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-repeat: no-repeat;
+  background-size: 100% 0.07em;
+  background-position: 0 96%;
+  padding-bottom: 0.06em;
+}
+
+/* ---------------------------------------------------------------- media  */
+.media {
+  border-radius: 28px;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  position: relative;
+}
+
+.media img,
+.media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.media--empty {
+  display: grid;
+  place-items: center;
+  background: repeating-linear-gradient(
+    -45deg,
+    #141817,
+    #141817 14px,
+    #171b1a 14px,
+    #171b1a 28px
+  );
+}
+
+.media__label {
+  text-align: center;
+  padding: 0 32px;
+  color: var(--faint);
+  font-size: 17px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.7;
+}
+
+/* -------------------------------------------------------------- backdrop */
+/* Media filling the stage behind a slide's text (Backdrop.jsx), under a scrim
+   that keeps the text readable. What stands on it has to be positioned, or
+   the media paints over it. */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  border-radius: 0;
+  border: 0;
+}
+
+.backdrop__scrim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(11, 13, 12, 0.5) 0%,
+    rgba(11, 13, 12, 0.82) 72%
+  );
+}
+
+.backdrop .media__label {
+  position: absolute;
+  bottom: 40px;
+  left: 0;
+  right: 0;
+  opacity: 0.55;
+}
+
+/* ---------------------------------------------------------- title slide  */
+.slide--title {
+  justify-content: center;
+}
+
+.titleblock {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  max-width: 1180px;
+}
+
+.titleblock__sub {
+  font-size: 34px;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+  color: var(--muted);
+  max-width: 880px;
+}
+
+/* When the subtitle is the claim rather than a gloss on the title. */
+.titleblock__sub--lead {
+  font-size: 40px;
+  line-height: 1.28;
+  letter-spacing: -0.02em;
+  color: var(--paper);
+}
+
+/* First line of a two-line subtitle: it names the thing, so it leads. */
+.sub-lede {
+  display: inline-block;
+  font-size: 52px;
+  letter-spacing: -0.025em;
+}
+
+/* Art beside the copy: the block stops being full-bleed and shares the row. */
+.slide--title--art {
+  flex-direction: row;
+  align-items: center;
+  gap: 96px;
+}
+
+.slide--title--art .titleblock {
+  flex: 1;
+  max-width: none;
+}
+
+.titleart {
+  width: 440px;
+  height: 440px;
+  flex: none;
+}
+
+/* -------------------------------------------------------- section slide  */
+.slide--section {
+  justify-content: center;
+}
+
+/**
+ * The internal pages, set on paper.
+ *
+ * `--ink` is the ground and `--paper` the mark on it, so inverting the slide
+ * is just swapping those two: everything inside keeps reading its colour from
+ * the tokens and none of it has to know it is on a light background. The
+ * accent has to be darkened by hand — the deck's lime is made to glow on
+ * black and all but disappears on white.
+ */
+.slide--invert {
+  --ink: #f4f3ef;
+  --paper: #0b0d0c;
+  --surface: #e7e5dd;
+  --line: rgba(11, 13, 12, 0.16);
+  --muted: rgba(11, 13, 12, 0.62);
+  --faint: rgba(11, 13, 12, 0.38);
+  --accent: #5f7d0d;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.sectionblock {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  max-width: 1340px;
+  border-left: 3px solid var(--accent);
+  padding-left: 48px;
+}
+
+/* Over a backdrop the block is positioned, to stand in front of it. */
+.backdrop__scrim ~ .sectionblock {
+  position: relative;
+}
+
+/* On a section slide the kicker is a subheading under the statement, not a
+   marginal note, so it is set larger and allowed a wider measure. */
+.sectionblock .kicker {
+  text-wrap: balance;
+  font-size: 30px;
+  color: var(--muted);
+  max-width: 48ch;
+}
+
+.flag {
+  position: absolute;
+  top: 56px;
+  left: var(--pad);
+  font-size: 15px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--accent);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+/* A section slide with a figure beside it: text on the left, figure right. */
+.slide--aside {
+  flex-direction: row;
+  align-items: center;
+  gap: 48px;
+}
+
+.slide--aside .sectionblock {
+  flex: 0 0 500px;
+  gap: 32px;
+}
+
+.slide--aside .h1 {
+  font-size: 60px;
+}
+
+.sectionaside {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---------------------------------------------------------- centred slide */
+/* Whatever the slide holds stands in the middle of the stage, each line
+   centred. A section block gives up the rule down its side, which only reads
+   against a left edge. */
+.slide--centered {
+  align-items: center;
+  text-align: center;
+}
+
+.slide--centered .sectionblock {
+  border-left: 0;
+  padding-left: 0;
+}
+
+/* ------------------------------------------------------------ slide head */
+/* The heading over a slide's cards or columns. */
+.slidehead {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 76px;
+}
+
+.slidehead .kicker {
+  max-width: 62ch;
+}
+
+/* ---------------------------------------------------------------- cards  */
+/* The boxes take two thirds and the figures stand apart on the last third:
+   evidence for the slide as a whole rather than a footnote to one claim. */
+.cardsrow {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 64px;
+  align-items: center;
+}
+
+/* Claims side by side, each boxed. The box is the diagram's, so a summary
+   slide reads as part of the same system as the schema behind it. */
+.cards {
+  display: grid;
+  gap: 24px;
+}
+
+.cards--2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+.cards--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.cards--4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 28px;
+  padding: 36px 36px 40px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(244, 243, 239, 0.035);
+}
+
+/* The claim, in the words the slide it came from used — badges and all, so a
+   line is recognisable as one already heard. The loose leading is what keeps
+   a badge on the second line clear of the first. */
+.card__text {
+  font-size: 28px;
+  line-height: 1.8;
+  letter-spacing: -0.02em;
+  color: var(--paper);
+}
+
+/* ------------------------------------------------------------- taxonomy  */
+/* An indented tree. Each item draws its own piece of the trunk (::before) and
+   its own tick into it (::after); the last item stops the trunk at its tick. */
+.tax,
+.tax__kids {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tax__kids {
+  margin-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 8px;
+}
+
+.tax__item--t1 + .tax__item--t1 {
+  margin-top: 8px;
+}
+
+.tax__kids > .tax__item {
+  position: relative;
+  padding-left: 30px;
+  --mid: 17px;
+}
+
+.tax__kids > .tax__item--t1 {
+  --mid: 21px;
+}
+
+.tax__kids > .tax__item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -8px;
+  bottom: 0;
+  border-left: 1.5px solid var(--faint);
+}
+
+.tax__kids > .tax__item:last-child::before {
+  bottom: auto;
+  height: calc(var(--mid) + 8px);
+}
+
+.tax__kids > .tax__item::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: var(--mid);
+  width: 22px;
+  border-top: 1.5px solid var(--faint);
+}
+
+.tax__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.tax__node {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.tax__node--t0 {
+  height: 48px;
+  padding: 0 22px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--ink);
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.tax__node--t1 {
+  height: 42px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1.5px solid var(--paper);
+  font-size: 21px;
+  font-weight: 600;
+}
+
+.tax__node--t2 {
+  height: 34px;
+  width: 184px;
+  font-size: 18px;
+}
+
+.tax__leaves {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tax__leaf {
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------ statement slides */
+/* A single claim carried at half-stage width, art or a diagram beside it. */
+.statement {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 96px;
+  height: 100%;
+  align-items: center;
+}
+
+.statement__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.statement__text {
+  text-wrap: balance;
+  font-size: 44px;
+  line-height: 1.22;
+  letter-spacing: -0.026em;
+  font-weight: 500;
+}
+
+/* Set under the claim and a size down from it: the claim is what the slide
+   says, this is what it gets you. */
+.statement__note {
+  font-size: 28px;
+  /* loose enough that badges on consecutive lines clear each other: a pill is
+     taller than the text it holds */
+  line-height: 1.8;
+  letter-spacing: -0.02em;
+  color: var(--muted);
+}
+
+/* The numbers that back the note up. Set large and in the accent, because a
+   figure is the one thing on a slide a room will remember. */
+.kpis {
+  display: flex;
+  gap: 72px;
+  margin: 0;
+}
+
+.kpi__star {
+  font-size: 0.5em;
+  vertical-align: 0.8em;
+  margin-left: 0.06em;
+}
+
+.kpis__note {
+  margin-top: 20px;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--faint);
+}
+
+.kpis--stack {
+  flex-direction: column;
+  gap: 52px;
+}
+
+.kpis--grid {
+  display: grid;
+  grid-template-columns: repeat(var(--kpi-cols), max-content);
+  gap: 44px 72px;
+}
+
+/* Beside the cards the column is a third of the slide: two figures share it
+   only once their labels give up some width. */
+.cardsrow .kpis--grid {
+  gap: 44px 40px;
+}
+
+.cardsrow .kpis--grid .kpi__label {
+  max-width: 180px;
+}
+
+.kpi__value {
+  font-size: 52px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--accent);
+}
+
+.kpi__label {
+  margin: 12px 0 0;
+  max-width: 220px;
+  font-size: 20px;
+  line-height: 1.35;
+  color: var(--muted);
+}
+
+.statement__list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-size: 24px;
+  line-height: 1.4;
+  color: var(--muted);
+  counter-reset: point;
+}
+
+/* Where the points are the slide's content and not a gloss on it: set in full
+   colour at the size a point's name would carry. */
+.statement__list--lead {
+  gap: 20px;
+  font-size: 28px;
+  color: var(--paper);
+}
+
+.statement__list li {
+  padding-left: 46px;
+  position: relative;
+  counter-increment: point;
+}
+
+.statement__list li::before {
+  content: counter(point, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+}
+
+.statement__listhead {
+  display: block;
+  font-size: 26px;
+  letter-spacing: -0.015em;
+  color: var(--paper);
+  margin-bottom: 4px;
+}
+
+/* Art still to come: the column holds its half of the stage regardless. */
+.statement__slot {
+  align-self: stretch;
+}

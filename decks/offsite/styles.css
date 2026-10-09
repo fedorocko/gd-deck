@@ -1,0 +1,669 @@
+/* The Offsite deck's own styles, on top of ../../shared/slides.css: the type
+   scale, the marks, the media frame, the backdrop and the title and section
+   slides come from there, shared with the ASP pitch, so the two decks read as
+   one family. */
+
+/* ------------------------------------------------------------ type scale */
+/* This deck's own headline classes, set in Funnel Display like the shared
+   scale. */
+.tile__text,
+.quote__text,
+.scene__word,
+.scene__shard,
+.scene__train-word {
+  font-family: var(--font-display);
+}
+
+/* ------------------------------------------------------------------ tiles */
+/* Slides 7, 9 and 10 stand on one two-column grid, so the boxes stay where
+   they are from slide to slide and only what is in them changes. A tile is
+   the ASP pitch's card, grown to hold one thought set large. */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 32px;
+  height: 100%;
+}
+
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 44px 52px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(244, 243, 239, 0.035);
+}
+
+.tile__text {
+  font-size: 64px;
+  line-height: 1.06;
+  letter-spacing: -0.028em;
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+/* The word a sentence opens on, when it is the one that matters: on a line of
+   its own at twice the size of the rest and in the accent. 128px is as large
+   as the tile's measure allows the longest of them, "Condition". */
+.tile__word {
+  display: block;
+  margin: 0 0 0.12em -0.03em;
+  font-size: 128px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+}
+
+/* A logo, centred on the tile with room around it. Until it is supplied the
+   whole tile is the placeholder. */
+.tile--media {
+  padding: 0;
+  overflow: hidden;
+}
+
+.tile__media {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  border-radius: inherit;
+}
+
+.tile__media:not(.media--empty) {
+  background: none;
+}
+
+.tile__media img {
+  object-fit: contain;
+  padding: 200px 140px;
+}
+
+/* A clip: a video filling the tile behind what it says (TilesLayout.jsx).
+   Shown at a fifth of its light and with some of its colour taken out, so
+   the text and its lime word stay the brightest things in the tile, and a
+   clip that opens on white paper sits little louder than one of dark racks.
+   It is cropped from the left only: the clips carry an “AI generated” mark
+   in their bottom right corner, which stays whole. The tile is made its own
+   layer so the clip can go behind the text without going behind the tile. */
+.tile--clip {
+  isolation: isolate;
+}
+
+.tile__clip {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: right;
+  border-radius: inherit;
+  opacity: 0.2;
+  filter: saturate(0.6);
+}
+
+/* Over moving footage a filled pill frosts what is behind it, so its label is
+   read against something even. An outlined one does not, or light footage
+   would fill it in. */
+.tile--clip .pill--filled {
+  backdrop-filter: blur(6px);
+}
+
+/* Four to a row. The type steps down to fit a column's measure, so the slide
+   gives the columns all the room it can: its margins come in to what still
+   keeps the tiles clear of the deck's arrow buttons, and the gutters close
+   up. */
+.slide--four {
+  padding: 80px 88px;
+}
+
+.tiles--four {
+  grid-template-columns: repeat(4, 1fr);
+  column-gap: 20px;
+  /* Air, the thought, its pills, air. Every tile takes these four rows as its
+     own, so the thoughts start on one line across the slide and the pills on
+     another, however many lines or pills a column has, and the group they
+     make sits in the middle of the tile. */
+  grid-template-rows: 1fr auto auto 1fr;
+  row-gap: 0;
+}
+
+.tiles--four .tile {
+  display: grid;
+  grid-row: 1 / -1;
+  grid-template-rows: subgrid;
+  padding: 44px 22px;
+}
+
+.tiles--four .tile__text {
+  grid-row: 2;
+  /* as large as lets the longest line, “creativity and”, stay on one */
+  font-size: 46px;
+  line-height: 1.1;
+  letter-spacing: -0.022em;
+}
+
+/* Stepped down like the type, to fit the longest of them in the column. */
+.tiles--four .pills {
+  --pill-h: 44px;
+  --pill-gap: 8px;
+  grid-row: 3;
+  margin-top: 36px;
+}
+
+.tiles--four .pill {
+  font-size: 22px;
+  padding: 0 20px;
+}
+
+/* ------------------------------------------------------------------ pills */
+/* The ASP pitch's badges, grown to be a tile's content rather than a line
+   under a claim, one to a row. Quiet by default: listed, legible, lit by
+   nothing. */
+.pills {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--pill-gap);
+}
+
+.pill {
+  display: block;
+  height: var(--pill-h);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: var(--pill-h);
+  letter-spacing: -0.015em;
+  padding: 0 24px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px rgba(250, 250, 247, 0.24);
+  white-space: nowrap;
+}
+
+/* Solid lime, the badge voice of the deck: what the slide is there to say. */
+.pill--lit {
+  background: var(--accent);
+  color: var(--ink);
+  box-shadow: none;
+}
+
+/* Filled, but in no colour: what stands behind a thought, there to be read
+   without taking the lime from the word the thought turns on. */
+.pill--filled {
+  background: rgba(250, 250, 247, 0.14);
+  box-shadow: none;
+}
+
+/* Not out yet: left as an outline beside the filled ones, and stepped back. */
+.pill--soon {
+  color: var(--muted);
+}
+
+/* ------------------------------------------------------------------ sides */
+/* Slides 9–10 share their two boxes (Sides.jsx), mounted once outside the
+   keyed slide, so the boxes and the features in them stay across the slide
+   change and what the features are worth comes in around them. A box is only
+   as tall as what it holds, the two keeping to the taller, so they grow as
+   the values open in them. On slide 10 the pair also steps down by half of
+   what the titles take up over them, 57px, which keeps titles and boxes
+   together in the middle of the stage. */
+.sides .tiles {
+  height: auto;
+  transition: transform 420ms var(--ease-move) 160ms;
+}
+
+.sides--values .tiles {
+  transform: translateY(57px);
+  transition: transform 520ms var(--ease-move);
+}
+
+.side {
+  --pill-h: 48px;
+  --pill-gap: 8px;
+}
+
+.side__groups {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* The features step back a little once their worth is in, so the eye goes to
+   the lime first. */
+.side .pills .pill {
+  transition: color 420ms ease;
+}
+
+.sides--values .side .pills .pill {
+  color: var(--muted);
+}
+
+/* The principle a side comes down to, set large over the middle of its box.
+   It is a pill too, outlined in the accent where the values under it are
+   solid: what they belong to, not one more of them. */
+.side__title {
+  position: absolute;
+  inset-inline: 0;
+  bottom: calc(100% + 16px);
+  width: fit-content;
+  margin-inline: auto;
+  padding: 13px 40px 17px;
+  border: 2px solid var(--accent);
+  border-radius: 999px;
+  font-size: 60px;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+}
+
+/* What a group is worth has a row of its own over the group, shut until
+   slide 10: it opens, the features parting to make room, and only then does
+   the pill come up in it. --i is the group's place in its box. Leaving, the
+   pill goes first and the row shuts after it. */
+.side__title,
+.side__value .pill {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 200ms ease,
+    transform 0ms linear 200ms;
+}
+
+.side__value {
+  display: flex;
+  height: 0;
+  margin-bottom: 0;
+  transition:
+    height 420ms var(--ease-move) 160ms,
+    margin-bottom 420ms var(--ease-move) 160ms;
+}
+
+.sides--values .side__value {
+  height: var(--pill-h);
+  margin-bottom: var(--pill-gap);
+  transition:
+    height 520ms var(--ease-move),
+    margin-bottom 520ms var(--ease-move);
+}
+
+.sides--values .side__title,
+.sides--values .side__value .pill {
+  opacity: 1;
+  transform: none;
+}
+
+.sides--values .side__title {
+  transition:
+    opacity 420ms ease 120ms,
+    transform 520ms var(--ease-move) 120ms;
+}
+
+.sides--values .side__value .pill {
+  transition:
+    opacity 420ms ease calc(380ms + var(--i) * 110ms),
+    transform 520ms var(--ease-move) calc(380ms + var(--i) * 110ms);
+}
+
+/* ------------------------------------------------------------------ brand */
+/* A product's mark set in a line with its name (Brand.jsx). Sized in em, so
+   it follows the type: just taller than the capitals and centred on them. */
+.brand {
+  white-space: nowrap;
+}
+
+.brand__logo {
+  display: inline-block;
+  height: 0.9em;
+  width: auto;
+  margin-right: 0.2em;
+  vertical-align: -0.1em;
+}
+
+/* A mark still to come: a dashed ring holding its place. */
+.brand__logo--empty {
+  width: 0.9em;
+  border: 0.03em dashed var(--faint);
+  border-radius: 50%;
+}
+
+/* ------------------------------------------------------------- screenshot */
+/* Close to the stage's edges: a product screen is detail the room has to
+   read. 1408 × 788 is the frame, so a 16:9 shot fits it uncut. */
+.slide--shot {
+  padding: 56px 96px;
+}
+
+.shot {
+  flex: 1;
+}
+
+.shot img {
+  object-position: top;
+}
+
+/* ------------------------------------------------------------------ quote */
+/* Two claims weighed against each other. Each stands on a line of its own,
+   large and in the accent; how the line opens and the word joining the two
+   are set small, so the eye lands on the claims first. */
+.quote {
+  margin: 0;
+  max-width: 1240px;
+}
+
+.quote__text {
+  font-weight: 500;
+}
+
+.quote__lead,
+.quote__claim,
+.quote__hinge {
+  display: block;
+}
+
+.quote__lead {
+  font-size: 56px;
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+}
+
+.quote__claim {
+  font-size: 100px;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  color: var(--accent);
+}
+
+.quote__hinge {
+  font-size: 44px;
+  line-height: 1.7;
+  letter-spacing: -0.01em;
+  color: var(--muted);
+}
+
+/* Hung outside the line: out of the flow, so the words alone are centred. */
+.quote__mark {
+  position: absolute;
+  color: var(--paper);
+}
+
+.quote__mark--open {
+  transform: translateX(-100%);
+}
+
+/* ------------------------------------------------------------------ scene */
+/* Slides 3–5 share one picture that changes as you go; scene/model.js says
+   where everything sits on each slide. It is mounted once, outside the keyed
+   slide, so it moves from one slide's arrangement to the next instead of
+   being redrawn. Each piece carries its own timing as --t (duration), --e
+   (easing) and --d (delay), set from the spot it is moving into. */
+.scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  animation: rise 420ms var(--ease-move) both;
+}
+
+.scene__piece {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition:
+    transform var(--t) var(--e) var(--d),
+    opacity var(--t) ease var(--d);
+}
+
+/* An isometric plane: upright edges stay upright and level ones climb to the
+   right at 30°. The face is drawn at its true size and slanted here, so the
+   piece around it is placed and moved like any flat one. */
+.scene__iso {
+  position: absolute;
+  inset: 0;
+  transform: matrix(0.866, -0.5, 0, 1, 0, 0);
+}
+
+/* The idea the slide turns on, lit the way the ASP pitch's schema lights its
+   focus — a lime wash, a solid lime edge, a glow — with the stage's own grid
+   ruled across it. */
+.scene__plane {
+  border: 1.5px solid var(--accent);
+  border-radius: 22px;
+  background:
+    linear-gradient(rgba(218, 254, 133, 0.13) 1px, transparent 1px) -1px -1px / 40px 40px,
+    linear-gradient(90deg, rgba(218, 254, 133, 0.13) 1px, transparent 1px) -1px -1px / 40px 40px,
+    linear-gradient(170deg, rgba(218, 254, 133, 0.2), rgba(218, 254, 133, 0.04) 75%);
+  box-shadow: 0 50px 110px -50px rgba(218, 254, 133, 0.55);
+  /* the slant of .scene__iso, spelt as the two moves it is made of so that it
+     can be eased away: upright edges stay upright all the way through */
+  transform: skewY(-30deg) scaleX(0.866);
+  transition: transform 800ms cubic-bezier(0.45, 0, 0.25, 1) 300ms;
+}
+
+/* As "Abstract" leaves it, the rectangle turns off its plane to face the
+   room, so that "Reduce" lands on a plain rectangle like the two boxes beside
+   it (`flat` in scene/model.js). The rectangle is not going anywhere, so the
+   turn is timed above rather than by its spot, and eased at both ends to
+   span the hand-over: it sets off as the word on it starts to fall, and
+   comes to rest as the next one lands. */
+.scene__piece--flat .scene__plane {
+  transform: skewY(0deg) scaleX(1);
+}
+
+.scene__word {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 88px;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* The person: a hatched frame until the picture arrives, then a cut-out
+   standing on the stage rather than a framed photo. */
+.scene__person {
+  position: absolute;
+  inset: 0;
+}
+
+.scene__person:not(.media--empty) {
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+
+.scene__person img {
+  object-fit: contain;
+  object-position: bottom;
+}
+
+/* A screen of the app, laid on its plane; screenshots keep their header when
+   the frame crops. */
+.scene__screen {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  box-shadow: 0 34px 60px -30px rgba(0, 0, 0, 0.9);
+}
+
+.scene__screen .media__label {
+  padding: 0 12px;
+  font-size: 13px;
+}
+
+.scene__screen img {
+  object-position: top;
+}
+
+/* Function and Form. Each box is drawn twice, once either side of a crack,
+   and the two halves line up into one box until the train hits: then they
+   part along the crack, and the box takes a jolt. */
+.scene__jolt {
+  position: absolute;
+  inset: 0;
+}
+
+.scene__shard {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 56px;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  font-weight: 500;
+  background: var(--surface);
+  border: 1px solid rgba(250, 250, 247, 0.22);
+  border-radius: 20px;
+  transition: transform var(--t) var(--e) var(--d);
+}
+
+/* The whole box goes the moment the blow lands, and comes back only once the
+   halves have closed up again. */
+.scene__shard--whole {
+  transition: opacity 0ms linear calc(var(--d) + var(--t));
+}
+
+.scene__box--broken .scene__shard--whole {
+  opacity: 0;
+  transition-delay: var(--d);
+}
+
+.scene__box--broken .scene__shard--a {
+  transform: translate(-9px, 4px) rotate(-2.5deg);
+}
+
+.scene__box--broken .scene__shard--b {
+  transform: translate(9px, -5px) rotate(2deg);
+}
+
+/* Only when the train has just run in; arriving at slide 5 from slide 6 finds
+   the damage already done. */
+.scene--impact .scene__jolt {
+  animation: scene-jolt 460ms ease-out var(--d) both;
+}
+
+@keyframes scene-jolt {
+  0%,
+  100% {
+    transform: none;
+  }
+  14% {
+    transform: translate(-7px, 4px) rotate(-1deg);
+  }
+  32% {
+    transform: translate(6px, -4px) rotate(0.8deg);
+  }
+  52% {
+    transform: translate(-3px, 2px);
+  }
+  72% {
+    transform: translate(2px, -1px);
+  }
+}
+
+/* The train is code, and on the next slide code is Claude Code: so it is set
+   in the orange of that mark (claude-code-logo.png), the one place the deck
+   leaves its lime, with the word in ink. --train is that orange exactly;
+   the skirts are the same colour a shade deeper. */
+.scene__train {
+  --train: #d97757;
+  --train-deep: color-mix(in srgb, var(--train) 74%, var(--ink));
+}
+
+.scene__train svg {
+  display: block;
+  overflow: visible;
+  filter: drop-shadow(0 0 30px color-mix(in srgb, var(--train) 34%, transparent));
+}
+
+.scene__train-body {
+  fill: var(--train);
+}
+
+.scene__train-skirt {
+  fill: var(--train-deep);
+}
+
+.scene__train-ink,
+.scene__train-glass {
+  fill: var(--ink);
+}
+
+/* Drawn with a round edge as wide as its corners, so the long sliver of the
+   windscreen comes to soft ends. */
+.scene__train-glass {
+  stroke: var(--ink);
+  stroke-width: 4;
+  stroke-linejoin: round;
+}
+
+/* A door is only a seam in the body. */
+.scene__train-seam {
+  fill: none;
+  stroke: var(--ink);
+  stroke-opacity: 0.35;
+  stroke-width: 2;
+}
+
+/* Light lying along the roof and across the windscreen. */
+.scene__train-gloss {
+  fill: none;
+  stroke: var(--paper);
+  stroke-opacity: 0.28;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+/* Steel, standing on the rail: dark with a bright rim, so the wheels show
+   against the stage under the skirts. */
+.scene__train-wheel {
+  fill: var(--surface);
+  stroke: rgba(250, 250, 247, 0.55);
+  stroke-width: 2;
+}
+
+.scene__train-hub {
+  fill: rgba(250, 250, 247, 0.55);
+}
+
+/* The headlamp, and the stops of its glow. */
+.scene__train-light {
+  fill: var(--paper);
+  stop-color: var(--paper);
+}
+
+.scene__train-word {
+  fill: var(--ink);
+  font-size: 76px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.scene__track {
+  background: linear-gradient(
+    90deg,
+    rgba(250, 250, 247, 0.32),
+    rgba(250, 250, 247, 0.32) 85%,
+    transparent
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sides .tiles,
+  .side .pills .pill,
+  .sides .side__title,
+  .sides .side__value,
+  .sides .side__value .pill,
+  .scene,
+  .scene__piece,
+  .scene__plane,
+  .scene__shard,
+  .scene--impact .scene__jolt {
+    animation: none;
+    transition: none;
+  }
+}

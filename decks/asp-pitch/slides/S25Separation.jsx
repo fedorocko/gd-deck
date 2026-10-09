@@ -1,6 +1,6 @@
-import Mark from '../components/Mark.jsx'
-import { CLICKHOUSE, IN_MEMORY_P90 } from '../benchmarks.js'
-import StatementLayout from '../layouts/StatementLayout.jsx'
+import Mark from '../../../shared/Mark.jsx'
+import { CLICKHOUSE, IN_MEMORY_P90 } from '../../../shared/benchmarks.js'
+import StatementLayout from '../../../shared/StatementLayout.jsx'
 
 export default function S25Separation() {
   return (

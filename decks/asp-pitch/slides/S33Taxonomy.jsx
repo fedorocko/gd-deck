@@ -1,5 +1,5 @@
-import Taxonomy from '../components/Taxonomy.jsx'
-import SectionLayout from '../layouts/SectionLayout.jsx'
+import Taxonomy from '../../../shared/Taxonomy.jsx'
+import SectionLayout from '../../../shared/SectionLayout.jsx'
 
 const points = [
   'I introduce a taxonomy to explain the ASP architecture and capabilities — think of it as a hierarchy.',

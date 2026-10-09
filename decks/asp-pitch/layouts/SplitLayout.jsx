@@ -1,6 +1,7 @@
-import Media from '../components/Media.jsx'
+import Media from '../../../shared/Media.jsx'
+import media from '../media.js'
 import Badges from '../components/Badges.jsx'
-import Kpis from '../components/Kpis.jsx'
+import Kpis from '../../../shared/Kpis.jsx'
 
 /** Large text on the left, media on the right.
  *  kpis: [{ value, label }] — the numbers that back the claim up.
@@ -32,7 +33,7 @@ export default function SplitLayout({
           {kpis && <Kpis items={kpis} />}
           {badges && <Badges items={badges} quiet={quietBadges} />}
         </div>
-        <Media name={mediaName} className={cx('split__media')} />
+        <Media name={mediaName} from={media} className={cx('split__media')} />
       </div>
     </section>
   )

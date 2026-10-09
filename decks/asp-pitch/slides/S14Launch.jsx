@@ -1,5 +1,5 @@
-import Taxonomy from '../components/Taxonomy.jsx'
-import SectionLayout from '../layouts/SectionLayout.jsx'
+import Taxonomy from '../../../shared/Taxonomy.jsx'
+import SectionLayout from '../../../shared/SectionLayout.jsx'
 
 export default function S14Launch() {
   return (

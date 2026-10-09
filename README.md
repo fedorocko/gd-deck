@@ -64,16 +64,31 @@ points at.
 ## How it is put together
 
 Each deck is a folder in `decks/` whose name is its URL: `decks/` is Vite's root, so
-`decks/offsite/` is published at `/gd-decks/offsite/`. The deck machinery is shared;
-everything a deck shows is its own.
+`decks/offsite/` is published at `/gd-decks/offsite/`. The deck machinery is shared, and so
+are the type scale and the few components every deck uses; everything else a deck shows
+is its own.
 
 | Path | What it holds |
 | --- | --- |
 | `decks/index.html` | the page at `/gd-decks/` listing the decks |
-| `decks/asp-pitch/` | the ASP pitch — slides, layouts, schema, styles; see its `README.md` |
-| `decks/offsite/` | the Offsite deck — one blank slide for now |
-| `shared/Deck.jsx` | the deck itself: stage, navigation, URL hash, presenting |
-| `shared/deck.css` | design tokens, the stage, and the deck's own buttons |
+| `decks/asp-pitch/` | the ASP pitch — slides, layouts, styles; see its `README.md` |
+| `decks/offsite/` | the Offsite deck — slides, the animated scene, styles, and the pitch's architecture run; see its `README.md` |
+| `shared/Deck.jsx` | the deck itself: stage, navigation, URL hash, presenting, speaker notes |
+| `shared/deck.css` | design tokens, the stage, and the deck's own buttons and notes column |
+| `shared/slides.css` | the type scale, emphasis marks, media frame, backdrop, figures, taxonomy, and the title, section, card and statement slides |
+| `shared/Mark.jsx` | a phrase inside a line, picked out in the accent |
+| `shared/Media.jsx` | an image or video from a deck's `media.js`, or its placeholder |
+| `shared/Backdrop.jsx` | media filling the stage behind a slide's text, under a scrim |
+| `shared/SectionLayout.jsx` | the section slide: one statement, ruled in the accent or centred |
+| `shared/TitleLayout.jsx` | the title slide: a name set large over its subtitle |
+| `shared/StatementLayout.jsx` | the statement slide: one claim on the left, art or the schema on the right |
+| `shared/CardsLayout.jsx` | a slide that stands on a handful of claims, each boxed |
+| `shared/Kpis.jsx` | the figures that back a claim up |
+| `shared/benchmarks.js` | the benchmark figures, in one place so a number and its footnote change together |
+| `shared/Taxonomy.jsx` | the Agentic Serving Plane as one indented tree |
+| `shared/Schema.jsx` | the animated diagram of the Agentic Serving Plane, behind the platform slides of both decks |
+| `shared/schema/` | that diagram's tree and states (`model.js`) and its geometry (`layout.js`) |
+| `shared/schema.css` | that diagram's look and timing |
 | `shared/useStageScale.js` | fits the stage to the window |
 | `shared/asset.js` | resolves `public/` paths against the base |
 | `public/` | favicon and media, served at the site root and shared by every deck |
@@ -83,23 +98,33 @@ Slides are authored against a fixed **1600 × 900** design space in plain pixels
 `shared/useStageScale.js` scales that stage to fit any window and letterboxes the rest, so
 nothing needs responsive rules and font sizes can be literal.
 
-A deck's `main.jsx` imports the shared styles, then its own, and mounts
+A deck's `main.jsx` imports the shared styles (`deck.css`, then `slides.css`, then
+`schema.css` if it shows the schema), then its own, and mounts
 `<Deck slides={slides} />`. The slides are components in running order; one marked
-`Slide.internal = true` is skipped while presenting. A deck can also pass `overlay`, a
+`Slide.internal = true` is skipped while presenting, and one with `Slide.notes` (a string,
+a thought to a line with a blank line between groups) shows them as speaker notes in a
+see-through column down the right of the window, outside presenting only. A deck can also pass `overlay`, a
 function of the current slide whose result renders outside the keyed slide and so survives
-the change — the ASP pitch uses it for its animated schema.
+the change — both decks use it for the animated schema, the offsite deck for its scene and
+its two boxes as well.
 
 The URL hash carries the slide number, so `asp-pitch/#7` is that deck's seventh slide.
 
 ### Adding a deck
 
-1. Copy `decks/offsite/` to a new folder beside it; the folder name is the deck's URL.
-2. In the copy's `index.html`, set the `<title>` and point the script at its own `main.jsx`.
+1. Make a folder in `decks/`; its name is the deck's URL. Copy in the offsite deck's
+   `index.html` and `main.jsx`, dropping its overlay and the `schema.css` import, and add a
+   `slides/index.js`
+   listing the slides in order and a `styles.css` for anything the deck adds.
+2. In the new `index.html`, set the `<title>` and point the script at its own `main.jsx`.
 3. Add the folder to `DECKS` in `vite.config.js`, and a row to the list in
    `decks/index.html`.
 
 When another deck wants the ASP pitch's layouts or components, move them into `shared/`
-rather than importing across deck folders.
+rather than importing across deck folders — as `Mark`, `Media`, `Backdrop`, `SectionLayout`
+and `TitleLayout` were for the offsite deck, and then everything the pitch's architecture run
+is built from: `StatementLayout`, `CardsLayout`, `Kpis`, `Taxonomy` and the `Schema`. `Media` is handed the deck's own `media.js` as `from`, so each deck still
+keeps its own files.
 
 ## Changing the look
 

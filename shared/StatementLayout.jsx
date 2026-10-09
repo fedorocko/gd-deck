@@ -1,4 +1,4 @@
-import Kpis from '../components/Kpis.jsx'
+import Kpis from './Kpis.jsx'
 
 /**
  * One claim on the left, art or a diagram on the right.

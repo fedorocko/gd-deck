@@ -1,4 +1,4 @@
-import SectionLayout from '../layouts/SectionLayout.jsx'
+import SectionLayout from '../../../shared/SectionLayout.jsx'
 
 export default function S10Proof() {
   return (

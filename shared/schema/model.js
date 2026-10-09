@@ -1,5 +1,6 @@
 /**
- * The one diagram that runs behind slides 16–27.
+ * The one diagram that runs behind the platform slides: the ASP pitch's
+ * slides 16–26 and the offsite deck's 14–24.
  *
  * There is a single tree holding every box that ever appears. A slide does not
  * draw its own picture: it names a *state*, and the state says which branches

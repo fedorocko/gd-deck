@@ -1,4 +1,4 @@
-import Mark from '../components/Mark.jsx'
+import Mark from '../../../shared/Mark.jsx'
 import SplitLayout from '../layouts/SplitLayout.jsx'
 
 export default function S09Creativity() {

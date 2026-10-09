@@ -1,0 +1,428 @@
+/* The schema diagram (Schema.jsx): the slides that walk through the Agentic
+   Serving Plane share one diagram that unfolds itself. It is mounted once, in
+   the stage rather than in the slide, so it animates across slide changes.
+   Geometry comes from schema/ in a 600-wide space; everything here is the
+   look and the timing. `--d` is the per-element fade delay: new boxes wait for
+   the old ones to have finished moving before they appear. A deck that shows
+   the schema imports this after slides.css. */
+
+.schema {
+  position: absolute;
+  overflow: hidden;
+  animation: rise 420ms var(--ease-move) both;
+}
+
+.schema__world {
+  position: absolute;
+  top: 0;
+  /* Must match the boxes' transform timing exactly. The two compose on screen
+     and usually pull opposite ways — the column grows downward while the view
+     pans up to follow it — so any difference in duration, easing or delay
+     makes a box overshoot its target and drift back. Sharing one curve keeps
+     every box's travel a single clean move. Staging comes from the fades. */
+  transition: transform 520ms var(--ease-move);
+}
+
+/* ------------------------------------------------------------------- boxes */
+.sx {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 14px;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  color: var(--muted);
+  background: rgba(244, 243, 239, 0.035);
+  border: 1px solid var(--line);
+  transition: transform 520ms var(--ease-move),
+    width 520ms var(--ease-move), height 520ms var(--ease-move),
+    font-size 520ms var(--ease-move), border-radius 520ms var(--ease-move),
+    background-color 420ms ease, border-color 420ms ease, color 420ms ease,
+    box-shadow 420ms ease, opacity 320ms ease var(--d, 0ms);
+}
+
+/* Boxes that carry an icon. It is parked on the left edge and the padding is
+   kept symmetrical, so the label stays centred in the box and never runs under
+   it. Both are set in em: the box animates its font-size between states, so
+   sizing the art off that makes it grow and shrink on the same curve. */
+.sx--icon {
+  padding: 0 3.4em;
+}
+
+.sx__icon {
+  position: absolute;
+  left: 0.6em;
+  top: 50%;
+  width: 2.4em;
+  height: 2.4em;
+  transform: translateY(-50%);
+  /* the art is silver on a dark stage: it recedes with the rest of the box
+     until the slide is about this layer */
+  opacity: 0.45;
+  transition: opacity 420ms ease;
+}
+
+.sx--hl .sx__icon {
+  opacity: 1;
+}
+
+/* A badge names one thing rather than standing for a layer: a single tight
+   line, with any icon scaled down to match. */
+.sx--badge {
+  padding: 0 10px;
+}
+
+.sx--badge.sx--icon {
+  padding: 0 2.2em;
+}
+
+.sx--badge .sx__icon {
+  left: 0.5em;
+  width: 1.6em;
+  height: 1.6em;
+}
+
+/* A card's picture. The frame belongs to the diagram, the art fills it. */
+.sx--pic {
+  padding: 0;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.sx__pic {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* the pictures are app screenshots: when the frame crops, keep the header */
+  object-position: top;
+}
+
+/* A picture taking its turn grown across its row. */
+.sx--spot {
+  border-color: var(--accent-line);
+}
+
+/* Art still to come, in the same hatch the slide placeholders use. */
+.sx--empty {
+  background: repeating-linear-gradient(
+    -45deg,
+    #141817,
+    #141817 10px,
+    #171b1a 10px,
+    #171b1a 20px
+  );
+}
+
+/* Two levels of highlight, used the same way on every diagram slide:
+   1. the focus — what the slide is about: a lime fill, a solid lime edge and
+      a glow, so it is the brightest thing in the column;
+   2. the parent — the box the focus hangs from, kept in view so the viewer
+      knows where they are: set in full white inside a thin lime outline, with
+      no fill, a clear step below the focus and above everything else. */
+.sx--hl {
+  color: var(--paper);
+  background: rgba(218, 254, 133, 0.18);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), 0 16px 40px -20px rgba(218, 254, 133, 0.45);
+}
+
+.sx--ctx {
+  color: var(--paper);
+  background: rgba(218, 254, 133, 0.04);
+  border-color: rgba(218, 254, 133, 0.6);
+  box-shadow: inset 0 0 0 1px rgba(218, 254, 133, 0.25);
+}
+
+.sx--ctx .sx__icon {
+  opacity: 1;
+}
+
+/* A tag hanging off the box above it: solid lime when lit, like the pills
+   elsewhere in the deck, and an outline otherwise. */
+.sx.sx--tag {
+  padding: 0 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  box-shadow: none;
+}
+
+.sx.sx--tag.sx--hl {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--ink);
+}
+
+/* Not shipped yet: a sticker slapped on the box's top-right corner, tilted so
+   it reads as an annotation on the diagram rather than part of it. White, not
+   lime, so it never competes with the slide's highlight. The outer element
+   rides the box's corner; the inner one carries the tilt and the offset. */
+.sx-soon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  pointer-events: none;
+  transition: transform 520ms var(--ease-move), opacity 320ms ease var(--d, 0ms);
+}
+
+.sx-soon span {
+  display: block;
+  transform: translate(-78%, -55%) rotate(8deg);
+  padding: 5px 10px 6px;
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: 0 6px 16px -6px rgba(0, 0, 0, 0.6);
+}
+
+/* Named but not highlighted: full-strength text in a neutral box, for boxes
+   that sit inside a highlighted structure rather than being the subject. */
+.sx--plain {
+  color: var(--paper);
+  border-color: rgba(250, 250, 247, 0.2);
+}
+
+.sx--plain .sx__icon {
+  opacity: 1;
+}
+
+/* ------------------------------------------------- column and arrow labels */
+.sx-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 22px;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  color: var(--faint);
+  white-space: nowrap;
+  transition: transform 520ms var(--ease-move), width 520ms var(--ease-move),
+    color 420ms ease, opacity 320ms ease var(--d, 0ms);
+}
+
+.sx-label--hl {
+  color: var(--accent);
+}
+
+/* A section title names a group of siblings, so it is set as a pill: lime
+   while its layer is the subject, an outline otherwise. */
+.sx-label--section {
+  height: 28px;
+}
+
+.sx-label__pill {
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  box-shadow: inset 0 0 0 1px var(--line);
+  transition: background-color 420ms ease, color 420ms ease,
+    box-shadow 420ms ease;
+}
+
+.sx-label--hl .sx-label__pill {
+  background: var(--accent);
+  color: var(--ink);
+  box-shadow: none;
+}
+
+/* Set beside an arrow, so it reads from the box it points away from. */
+.sx-label--arrow {
+  height: 26px;
+  justify-content: flex-start;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  color: var(--paper);
+}
+
+/* A row of logos at the end of an arrow: who that layer opens out to. */
+.sx-label--logos {
+  height: 42px;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.sx-label--logos img {
+  width: 42px;
+  height: 42px;
+  display: block;
+}
+
+/* A pill that is a node of the drawing in its own right (the catalog), sized
+   by the layout rather than by its text so arrows can meet its edges. */
+.sx-label--pill {
+  height: 38px;
+  align-items: stretch;
+}
+
+.sx-label--pill .sx-label__pill {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+}
+
+/* A logo still to come: a dashed ring holding its place. */
+.sx-slot {
+  width: 42px;
+  height: 42px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1.5px dashed var(--faint);
+  color: var(--faint);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* A logo set inside a box on one slide only, where a layer icon would sit. */
+.sx__slot-logo {
+  opacity: 1;
+}
+
+/* --------------------------------------------- grouping frames and arrows  */
+.sx-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* Drawn, not filled: a frame groups the boxes inside it, and a tint would
+     read as another box sitting behind them. */
+  border: 3px solid var(--accent-line);
+  border-radius: 18px;
+  transition: transform 520ms var(--ease-move), width 520ms var(--ease-move),
+    height 520ms var(--ease-move), opacity 320ms ease var(--d, 0ms);
+}
+
+/* A frame that is the subject: the tree's own structure, drawn in full lime
+   so it outranks the boxes it holds. */
+.sx-frame--strong {
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 24px -8px rgba(218, 254, 133, 0.45);
+}
+
+.sx-arrows {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.sx-arrows path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-opacity: 0.8;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: opacity 320ms ease var(--d, 0ms);
+}
+
+.sx-arrows path.sx-arrows__head {
+  fill: var(--accent);
+  stroke: none;
+}
+
+/* A flow in motion: a band of light sweeps through each box in turn, and the
+   arrow after it flashes as the light hands over to the next, so the eye
+   follows the sequence round and round. Every piece shares one period and is
+   offset by its step (--i), which keeps them in lockstep without a script. */
+.sx--flow {
+  overflow: hidden;
+}
+
+.sx--flow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 55%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(218, 254, 133, 0.32),
+    transparent
+  );
+  transform: translateX(-120%);
+  /* under the label: the box's transform makes it a stacking context, so -1
+     still paints above the box's own fill */
+  z-index: -1;
+  pointer-events: none;
+  animation: sx-sweep var(--flow-period) linear infinite;
+  animation-delay: calc(var(--i) * var(--flow-step) + 700ms);
+}
+
+.sx-arrows path.sx-arrows__flow {
+  animation: sx-handover var(--flow-period) ease-out infinite;
+  animation-delay: calc(var(--i) * var(--flow-step) + 700ms + 560ms);
+}
+
+.schema {
+  --flow-period: 2700ms;
+  --flow-step: 900ms;
+}
+
+@keyframes sx-sweep {
+  0% {
+    transform: translateX(-120%);
+  }
+  26% {
+    transform: translateX(220%);
+  }
+  100% {
+    transform: translateX(220%);
+  }
+}
+
+@keyframes sx-handover {
+  0%,
+  100% {
+    stroke-opacity: 0.8;
+    stroke-width: 1.6;
+  }
+  8% {
+    stroke-opacity: 1;
+    stroke-width: 3;
+  }
+  22% {
+    stroke-opacity: 0.8;
+    stroke-width: 1.6;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sx--flow::before {
+    animation: none;
+    display: none;
+  }
+
+  .schema,
+  .schema__world,
+  .sx,
+  .sx__icon,
+  .sx-label,
+  .sx-frame,
+  .sx-arrows path {
+    animation: none;
+    transition: none;
+  }
+}

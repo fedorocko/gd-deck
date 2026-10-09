@@ -1,4 +1,4 @@
-import Kpis from '../components/Kpis.jsx'
+import Kpis from './Kpis.jsx'
 
 /**
  * A slide that stands on a handful of claims, each boxed.

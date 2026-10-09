@@ -1,10 +1,10 @@
-import Mark from '../components/Mark.jsx'
+import Mark from '../../../shared/Mark.jsx'
 import {
   ACCURACY,
   CLICKHOUSE,
   IN_MEMORY_P90,
   LATENCY,
-} from '../benchmarks.js'
+} from '../../../shared/benchmarks.js'
 import SplitLayout from '../layouts/SplitLayout.jsx'
 
 export default function S08Efficiency() {

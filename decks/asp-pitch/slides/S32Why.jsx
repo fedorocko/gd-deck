@@ -1,11 +1,11 @@
-import CardsLayout from '../layouts/CardsLayout.jsx'
+import CardsLayout from '../../../shared/CardsLayout.jsx'
 import {
   ACCURACY,
   CLICKHOUSE,
   IN_MEMORY_P90,
   LATENCY,
-} from '../benchmarks.js'
-import Mark from '../components/Mark.jsx'
+} from '../../../shared/benchmarks.js'
+import Mark from '../../../shared/Mark.jsx'
 
 // The four promises made over the course of the architecture run, collected in
 // the words they were made in: slides 16, 17, 25 and 26.

@@ -1,4 +1,4 @@
-import Mark from '../components/Mark.jsx'
+import Mark from '../../../shared/Mark.jsx'
 import ColumnsLayout from '../layouts/ColumnsLayout.jsx'
 
 export default function S04Readiness() {

@@ -1,4 +1,4 @@
-import TitleLayout from '../layouts/TitleLayout.jsx'
+import TitleLayout from '../../../shared/TitleLayout.jsx'
 
 export default function S02Title() {
   return (

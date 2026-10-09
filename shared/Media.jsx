@@ -1,10 +1,13 @@
 import { useRef } from 'react'
-import assetUrl from '../../../shared/asset.js'
-import media from '../media.js'
+import assetUrl from './asset.js'
 
-/** Renders the asset for `name`, or a labelled placeholder until it exists. */
-export default function Media({ name, className = '', style }) {
-  const asset = media[name]
+/**
+ * Renders the asset for `name`, or a labelled placeholder until it exists.
+ * from: the deck's own media list (its media.js) — every deck keeps its own
+ * files, so the list is handed in rather than imported here.
+ */
+export default function Media({ name, from, className = '', style }) {
+  const asset = from?.[name]
   const cls = `media ${asset?.src ? '' : 'media--empty'} ${className}`.trim()
 
   if (!asset?.src) {
